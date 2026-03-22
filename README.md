@@ -4,7 +4,7 @@ This repository is being built in the strict order defined by `PLAN.md`.
 
 ## Current implemented stage
 
-Only **Step 1 - environment validation** and **Step 2 - kernel resolution** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, and **Step 3 - kernel loading** are implemented.
 
 ## Execution requirements
 
@@ -14,6 +14,8 @@ Only **Step 1 - environment validation** and **Step 2 - kernel resolution** are 
   `/Applications/NV5/idl92/bin/bin.darwin.arm64/idl`
 - `KERNELS_PATH` must be defined and must point to a readable local kernel root directory.
 - `python3` must be available and able to import the `yaml` module.
+- The local ICY DLM must be available in:
+  `/Users/mwolff/lib/Darwin_arm64`
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
 - The repository does not download kernels and does not fall back to guessed paths.
@@ -44,6 +46,7 @@ From the IDL prompt, change into the repository and compile the current files:
 CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
 .COMPILE 'src/validate_environment.pro'
 .COMPILE 'src/resolve_kernels.pro'
+.COMPILE 'src/load_kernels.pro'
 .COMPILE 'run_pipeline.pro'
 RUN_PIPELINE
 ```
@@ -59,4 +62,5 @@ Expected behavior:
 - execution stops immediately with a clear message if `KERNELS_PATH` is missing or invalid
 - execution stops immediately with a clear message if `python3` cannot import `yaml`
 - execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous in the deterministic search locations beneath `KERNELS_PATH`
-- execution prints the validated kernel root and the resolved meta-kernel path when the current checks pass
+- execution stops immediately with a clear message if the ICY DLM is missing or if `cspice_furnsh` cannot load the resolved meta-kernel
+- execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass
