@@ -2,9 +2,17 @@
 
 This repository is being built in the strict order defined by `PLAN.md`.
 
+## Completed Steps
+
+- Step 1: environment validation
+- Step 2: kernel resolution
+- Step 3: kernel loading
+- Step 4: time handling
+- Step 5: single-epoch state-vector retrieval
+
 ## Current implemented stage
 
-Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, and **Step 4 - time handling** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, and **Step 5 - single-epoch state-vector retrieval** are implemented.
 
 ## Execution requirements
 
@@ -20,6 +28,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - `nsp_run_tests.pro` expects to be launched from the repository root so it can add both `src/` and `tests/` to `!PATH` automatically.
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
+- Step 5 state retrieval uses frame `IAU_MARS`, observer `MARS`, target `TGO`, and aberration correction `NONE`.
 - The repository does not download kernels and does not fall back to guessed paths.
 
 Install the Python YAML module with:
@@ -74,11 +83,20 @@ Or use the reporting procedure:
 NSP_TIME_GRID, START_UTC='2025-01-01T00:00:00', STEP_SECONDS=60D, POINT_COUNT=3L, ET_VALUES=grid
 ```
 
-## Step 4 tests
+## State-vector usage
+
+After kernels are loaded, Step 5 state retrieval can be used directly with one ET value:
+
+```idl
+et_value = NSP_UTC_TO_ET('2025-01-01T00:00:00')
+NSP_STATE_VECTORS, ET=et_value, STATE_VECTOR=state_vector, LIGHT_TIME=light_time
+```
+
+## Tests
 
 Step-specific test routines now live under the repository root `tests/` directory.
 
-A focused Step 4 test run is available through the test entrypoint:
+A focused test run is available through the test entrypoint:
 
 ```idl
 CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
@@ -86,11 +104,13 @@ CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_positio
 NSP_RUN_TESTS
 ```
 
-The current Step 4 test set checks:
-- one successful UTC-to-ET conversion against direct `cspice_str2et`
-- one successful 3-point ET grid with 60-second spacing
-- one empty-UTC failure case
-- one invalid-point-count failure case
+The current test set checks:
+- Step 4 UTC-to-ET conversion against direct `cspice_str2et`
+- Step 4 regular 3-point ET grid spacing
+- Step 4 empty-UTC failure handling
+- Step 4 invalid-point-count failure handling
+- Step 5 single-epoch TGO state retrieval against direct `cspice_spkezr`
+- Step 5 invalid-ET failure handling
 
 Expected behavior:
 
@@ -102,4 +122,5 @@ Expected behavior:
 - execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous in the deterministic search locations beneath `KERNELS_PATH`
 - execution stops immediately with a clear message if `cspice_furnsh` cannot load the resolved meta-kernel
 - execution stops immediately with a clear message if `cspice_str2et` cannot convert the requested UTC string
+- execution stops immediately with a clear message if `cspice_spkezr` cannot retrieve the requested state vector
 - execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass

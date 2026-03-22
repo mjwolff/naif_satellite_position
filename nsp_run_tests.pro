@@ -26,4 +26,5 @@ pro nsp_run_tests
 
   nsp_run_pipeline
   nsp_test_time_handling
+  nsp_test_state_vectors
 end

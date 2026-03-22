@@ -1,22 +1,3 @@
-pro nsp_assert_true, condition, failure_message
-  compile_opt strictarr
-
-  if ~condition then begin
-    message, 'Step 4 tests failed: ' + failure_message, /NONAME
-  endif
-end
-
-
-pro nsp_assert_close, actual_value, expected_value, tolerance, failure_message
-  compile_opt strictarr
-
-  difference = abs(double(actual_value) - double(expected_value))
-  if difference gt double(tolerance) then begin
-    message, 'Step 4 tests failed: ' + failure_message, /NONAME
-  endif
-end
-
-
 pro nsp_test_utc_to_et_success
   compile_opt strictarr
 

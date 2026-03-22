@@ -13,3 +13,6 @@
 - Implemented Step 4 time handling with strict `UTC -> ET` conversion and reusable regular ET grid generation.
 - Added focused Step 4 tests for UTC conversion, regular time-grid spacing, and expected failure cases.
 - Moved repository test routines into a root-level `tests/` directory and updated `nsp_run_tests.pro` to load them from there.
+- Implemented Step 5 single-epoch TGO state-vector retrieval in `IAU_MARS` with aberration correction `NONE`.
+- Added focused Step 5 tests for direct state-vector agreement with `cspice_spkezr` and invalid-ET failure handling.
+- Split Step 5 helper and test assertion routines into autoloadable modules and kept state retrieval meta-kernel-directory-aware so relative SPICE kernel references remain usable at runtime.

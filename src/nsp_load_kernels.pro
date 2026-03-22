@@ -132,9 +132,11 @@ pro nsp_load_kernels, resolved_meta_kernel, kernel_count=kernel_count
   if error_status ne 0 then begin
     catch, /cancel
     cd, original_directory
+    dummy_meta_kernel_path = nsp_loaded_meta_kernel_path(/clear)
     message, 'Step 3 kernel loading failed: ' + !error_state.msg, /NONAME
   endif
 
+  dummy_meta_kernel_path = nsp_loaded_meta_kernel_path(/clear)
   nsp_initialize_icy_runtime
   nsp_spice_kclear_checked
 
@@ -151,9 +153,10 @@ pro nsp_load_kernels, resolved_meta_kernel, kernel_count=kernel_count
     message, 'Step 3 kernel loading failed: the resolved meta-kernel is not present in the loaded kernel registry: ' + meta_kernel_path, /NONAME
   endif
 
+  meta_kernel_state = nsp_loaded_meta_kernel_path(set_value=meta_kernel_path)
   catch, /cancel
 
   print, 'Step 3 kernel loading passed.'
-  print, 'Loaded meta-kernel=' + meta_kernel_path
+  print, 'Loaded meta-kernel=' + meta_kernel_state
   print, 'Loaded kernel count=' + strtrim(kernel_count, 2)
 end
