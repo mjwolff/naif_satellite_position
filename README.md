@@ -41,7 +41,7 @@ If the canonical launcher fails in the Codex sandbox with `Unable to recognize s
 From the IDL prompt, change into the repository and compile the current files:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/devel'
+CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
 .COMPILE 'src/validate_environment.pro'
 .COMPILE 'src/resolve_kernels.pro'
 .COMPILE 'run_pipeline.pro'
