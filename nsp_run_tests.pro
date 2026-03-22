@@ -28,4 +28,6 @@ pro nsp_run_tests
   nsp_test_time_handling
   nsp_test_state_vectors
   nsp_test_geometry
+  nsp_test_solar_geometry
+  nsp_test_occultation
 end

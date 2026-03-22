@@ -10,10 +10,12 @@ This repository is being built in the strict order defined by `PLAN.md`.
 - Step 4: time handling
 - Step 5: single-epoch state-vector retrieval
 - Step 6: geometry conversion
+- Step 7: solar geometry
+- Step 8: occultation geometry
 
 ## Current implemented stage
 
-Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, and **Step 6 - geometry conversion** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, **Step 6 - geometry conversion**, **Step 7 - solar geometry**, and **Step 8 - occultation geometry** are implemented.
 
 ## Execution requirements
 
@@ -31,6 +33,8 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - The default meta-kernel name is `em16_ops.tm`.
 - Step 5 state retrieval uses frame `IAU_MARS`, observer `MARS`, target `TGO`, and aberration correction `NONE`.
 - Step 6 geometry uses a documented Mars mean radius of `3389.5 km` for spherical altitude.
+- Step 7 solar geometry uses frame `IAU_MARS`, observer `MARS`, target `SUN`, aberration correction `NONE`, and reports a spacecraft-local solar zenith angle defined between the outward radial vector and the spacecraft-to-Sun direction.
+- Step 8 occultation geometry treats the initial tangent point as the minimum-radius point on the spacecraft-to-Sun line and flags non-occultation cases explicitly instead of returning misleading tangent geometry.
 - The repository does not download kernels and does not fall back to guessed paths.
 
 Install the Python YAML module with:
@@ -105,6 +109,28 @@ NSP_GEOMETRY, ET=et_value, STATE_VECTOR=state_vector, LONGITUDE=longitude, LATIT
 
 Longitude and latitude are returned in radians. Radius and altitude are returned in kilometers.
 
+## Solar geometry usage
+
+After Step 6 is available, Step 7 solar geometry can be used with the same ET value:
+
+```idl
+et_value = NSP_UTC_TO_ET('2025-01-01T00:00:00')
+NSP_SOLAR_GEOMETRY, ET=et_value, STATE_VECTOR=state_vector, SUN_STATE_VECTOR=sun_state_vector, SPACECRAFT_TO_SUN_VECTOR=spacecraft_to_sun_vector, SOLAR_ZENITH_ANGLE=solar_zenith_angle
+```
+
+`SOLAR_ZENITH_ANGLE` is returned in radians. The current definition is spacecraft-local: the angle between the outward radial vector and the spacecraft-to-Sun direction.
+
+## Occultation usage
+
+After Step 7 is available, Step 8 occultation geometry can be used with the same ET value:
+
+```idl
+et_value = NSP_UTC_TO_ET('2025-01-01T00:00:00')
+NSP_OCCULTATION, ET=et_value, TANGENT_POINT_VECTOR=tangent_point_vector, TANGENT_LONGITUDE=tangent_longitude, TANGENT_LATITUDE=tangent_latitude, TANGENT_RADIUS=tangent_radius, TANGENT_ALTITUDE=tangent_altitude, OCCULTATION_VALID=occultation_valid, CLOSEST_APPROACH_DISTANCE=closest_approach_distance
+```
+
+If `OCCULTATION_VALID` is `0`, the code explicitly flags a non-occultation case and leaves the tangent-point geometry values non-finite instead of presenting them as valid outputs.
+
 ## Tests
 
 Step-specific test routines now live under the repository root `tests/` directory.
@@ -127,6 +153,12 @@ The current test set checks:
 - Step 6 spacecraft geometry conversion against direct `cspice_reclat`
 - Step 6 altitude computation from the documented Mars mean radius
 - Step 6 invalid-state failure handling
+- Step 7 Sun state retrieval against direct `cspice_spkezr`
+- Step 7 spacecraft-local solar zenith angle against the direct dot-product definition
+- Step 7 invalid-spacecraft-state failure handling
+- Step 8 tangent-point construction on the spacecraft-to-Sun line
+- Step 8 explicit non-occultation flagging
+- Step 8 invalid-spacecraft-state failure handling
 
 Expected behavior:
 
@@ -140,4 +172,6 @@ Expected behavior:
 - execution stops immediately with a clear message if `cspice_str2et` cannot convert the requested UTC string
 - execution stops immediately with a clear message if `cspice_spkezr` cannot retrieve the requested state vector
 - execution stops immediately with a clear message if geometry conversion or `cspice_reclat` validation fails
+- execution stops immediately with a clear message if Sun state retrieval or solar geometry validation fails
+- execution stops immediately with a clear message if occultation geometry construction fails
 - execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass

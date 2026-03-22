@@ -18,3 +18,7 @@
 - Split Step 5 helper and test assertion routines into autoloadable modules and kept state retrieval meta-kernel-directory-aware so relative SPICE kernel references remain usable at runtime.
 - Implemented Step 6 spacecraft geometry conversion with a documented Mars mean radius of `3389.5 km`.
 - Added Step 6 validation against direct `cspice_reclat` and focused geometry tests for successful conversion and invalid-state failure handling.
+- Implemented Step 7 solar geometry with explicit Sun-state retrieval in `IAU_MARS` and a documented spacecraft-local solar zenith angle definition.
+- Added Step 7 tests for direct Sun-state agreement with `cspice_spkezr`, solar zenith angle consistency, and invalid-state failure handling.
+- Implemented Step 8 occultation geometry as the minimum-radius point on the spacecraft-to-Sun line with explicit non-occultation flagging.
+- Added Step 8 tests for tangent-point construction, non-occultation handling, and invalid-state failure handling.
