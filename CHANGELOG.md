@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-03-22
+- Updated Step 9 planning so Keplerian elements can be calculated and exported optionally when explicitly requested, without making them mandatory for every run.
 - Added strict Step 1 environment validation for `KERNELS_PATH`, `python3` YAML-module availability, and local ICY DLM files.
 - Implemented deterministic meta-kernel resolution under `KERNELS_PATH` with default `em16_ops.tm`.
 - Added a reusable cross-repo `changelog-maintainer` skill and enforced changelog maintenance in repository rules.
@@ -22,3 +23,6 @@
 - Added Step 7 tests for direct Sun-state agreement with `cspice_spkezr`, solar zenith angle consistency, and invalid-state failure handling.
 - Implemented Step 8 occultation geometry as the minimum-radius point on the spacecraft-to-Sun line with explicit non-occultation flagging.
 - Added Step 8 tests for tangent-point construction, non-occultation handling, and invalid-state failure handling.
+- Implemented Step 9 fixed-schema CSV export beneath `outputs/`.
+- Added optional Keplerian-element export using a separate Mars-centered `J2000` state so rotating-frame `IAU_MARS` geometry is not reused for osculating elements.
+- Added Step 9 tests for fixed-schema CSV writing and optional Keplerian-element export.

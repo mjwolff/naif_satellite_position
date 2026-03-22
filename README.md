@@ -12,10 +12,11 @@ This repository is being built in the strict order defined by `PLAN.md`.
 - Step 6: geometry conversion
 - Step 7: solar geometry
 - Step 8: occultation geometry
+- Step 9: CSV export
 
 ## Current implemented stage
 
-Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, **Step 6 - geometry conversion**, **Step 7 - solar geometry**, and **Step 8 - occultation geometry** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, **Step 6 - geometry conversion**, **Step 7 - solar geometry**, **Step 8 - occultation geometry**, and **Step 9 - CSV export** are implemented.
 
 ## Execution requirements
 
@@ -29,12 +30,14 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
   `/Users/mwolff/lib/Darwin_arm64`
 - `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
 - `nsp_run_tests.pro` expects to be launched from the repository root so it can add both `src/` and `tests/` to `!PATH` automatically.
+- Repository exports are written beneath the root `outputs/` directory.
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
 - Step 5 state retrieval uses frame `IAU_MARS`, observer `MARS`, target `TGO`, and aberration correction `NONE`.
 - Step 6 geometry uses a documented Mars mean radius of `3389.5 km` for spherical altitude.
 - Step 7 solar geometry uses frame `IAU_MARS`, observer `MARS`, target `SUN`, aberration correction `NONE`, and reports a spacecraft-local solar zenith angle defined between the outward radial vector and the spacecraft-to-Sun direction.
 - Step 8 occultation geometry treats the initial tangent point as the minimum-radius point on the spacecraft-to-Sun line and flags non-occultation cases explicitly instead of returning misleading tangent geometry.
+- Optional Keplerian-element export is available in Step 9 only when explicitly requested, and those elements are derived from a separate Mars-centered `J2000` state rather than the rotating `IAU_MARS` state.
 - The repository does not download kernels and does not fall back to guessed paths.
 
 Install the Python YAML module with:
@@ -131,6 +134,33 @@ NSP_OCCULTATION, ET=et_value, TANGENT_POINT_VECTOR=tangent_point_vector, TANGENT
 
 If `OCCULTATION_VALID` is `0`, the code explicitly flags a non-occultation case and leaves the tangent-point geometry values non-finite instead of presenting them as valid outputs.
 
+## Export usage
+
+After kernels are loaded, Step 9 export can write one CSV file per run beneath `outputs/`:
+
+```idl
+NSP_EXPORT_CSV, UTC_STRING='2025-01-01T00:00:00', CASE_ID='single_case', OUTPUT_FILENAME='single_case.csv', OUTPUT_PATH=output_path
+print, output_path
+```
+
+The fixed base CSV schema is:
+
+```text
+case_id,utc,et,sc_x_km,sc_y_km,sc_z_km,sc_vx_km_s,sc_vy_km_s,sc_vz_km_s,sc_longitude_rad,sc_latitude_rad,sc_radius_km,sc_altitude_km,solar_zenith_angle_rad,occultation_valid,tangent_x_km,tangent_y_km,tangent_z_km,tangent_longitude_rad,tangent_latitude_rad,tangent_radius_km,tangent_altitude_km
+```
+
+Optional Keplerian columns can be appended explicitly:
+
+```idl
+NSP_EXPORT_CSV, UTC_STRING='2025-01-01T00:00:00', CASE_ID='single_case_kep', OUTPUT_FILENAME='single_case_kep.csv', OUTPUT_PATH=output_path, /INCLUDE_KEPLERIAN_ELEMENTS
+```
+
+The optional Keplerian columns are appended in this order:
+
+```text
+kep_rp_km,kep_eccentricity,kep_inclination_rad,kep_longitude_of_ascending_node_rad,kep_argument_of_periapsis_rad,kep_mean_anomaly_rad,kep_epoch_et,kep_mu_km3_s2
+```
+
 ## Tests
 
 Step-specific test routines now live under the repository root `tests/` directory.
@@ -159,11 +189,14 @@ The current test set checks:
 - Step 8 tangent-point construction on the spacecraft-to-Sun line
 - Step 8 explicit non-occultation flagging
 - Step 8 invalid-spacecraft-state failure handling
+- Step 9 fixed-schema CSV export under `outputs/`
+- Step 9 optional Keplerian-element export from a separate Mars-centered `J2000` state
 
 Expected behavior:
 
 - execution stops immediately with a clear message if `src/` is not available from the current working directory
 - execution stops immediately with a clear message if `tests/` is not available from the current working directory
+- execution stops immediately with a clear message if `outputs/` is not available from the current working directory
 - execution stops immediately with a clear message if `KERNELS_PATH` is missing or invalid
 - execution stops immediately with a clear message if `python3` cannot import `yaml`
 - execution stops immediately with a clear message if the ICY DLM directory, `icy.dlm`, or `icy.so` is missing or unreadable
@@ -174,4 +207,5 @@ Expected behavior:
 - execution stops immediately with a clear message if geometry conversion or `cspice_reclat` validation fails
 - execution stops immediately with a clear message if Sun state retrieval or solar geometry validation fails
 - execution stops immediately with a clear message if occultation geometry construction fails
+- execution stops immediately with a clear message if CSV export or optional Keplerian-element export fails
 - execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass

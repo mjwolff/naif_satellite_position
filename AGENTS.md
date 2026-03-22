@@ -190,6 +190,9 @@ At minimum, required columns should include:
 - tangent-point longitude
 - tangent-point altitude
 
+Optional columns may include Keplerian elements when that export mode is explicitly requested.
+These elements must not be treated as mandatory for every run.
+
 ### 8.2 Failure handling in outputs
 - do not quietly emit partial rows that look valid when a computation failed
 - either mark the failure explicitly or prevent the bad row from being presented as successful output

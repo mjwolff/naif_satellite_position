@@ -252,6 +252,8 @@ Implement code that:
 - writes CSV output with a fixed schema
 - writes one file per run or case
 - includes enough metadata columns for traceability
+- optionally calculates and exports Keplerian elements when explicitly requested for a run
+- does not require Keplerian-element calculation for every export
 
 Deliverable:
 - `nsp_export_csv.pro`
