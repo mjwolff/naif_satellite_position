@@ -11,3 +11,5 @@
 - Updated the entrypoint to add the repository `src/` directory to `!PATH` automatically so it can be run after compiling only `nsp_run_pipeline.pro`.
 - Renamed all repository `.pro` files and internal procedures/functions with the `nsp_` prefix.
 - Implemented Step 4 time handling with strict `UTC -> ET` conversion and reusable regular ET grid generation.
+- Added focused Step 4 tests for UTC conversion, regular time-grid spacing, and expected failure cases.
+- Moved repository test routines into a root-level `tests/` directory and updated `nsp_run_tests.pro` to load them from there.

@@ -17,6 +17,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - The local ICY DLM directory, descriptor, and shared library must be available in:
   `/Users/mwolff/lib/Darwin_arm64`
 - `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
+- `nsp_run_tests.pro` expects to be launched from the repository root so it can add both `src/` and `tests/` to `!PATH` automatically.
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
 - The repository does not download kernels and does not fall back to guessed paths.
@@ -73,9 +74,28 @@ Or use the reporting procedure:
 NSP_TIME_GRID, START_UTC='2025-01-01T00:00:00', STEP_SECONDS=60D, POINT_COUNT=3L, ET_VALUES=grid
 ```
 
+## Step 4 tests
+
+Step-specific test routines now live under the repository root `tests/` directory.
+
+A focused Step 4 test run is available through the test entrypoint:
+
+```idl
+CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
+.COMPILE 'nsp_run_tests.pro'
+NSP_RUN_TESTS
+```
+
+The current Step 4 test set checks:
+- one successful UTC-to-ET conversion against direct `cspice_str2et`
+- one successful 3-point ET grid with 60-second spacing
+- one empty-UTC failure case
+- one invalid-point-count failure case
+
 Expected behavior:
 
 - execution stops immediately with a clear message if `src/` is not available from the current working directory
+- execution stops immediately with a clear message if `tests/` is not available from the current working directory
 - execution stops immediately with a clear message if `KERNELS_PATH` is missing or invalid
 - execution stops immediately with a clear message if `python3` cannot import `yaml`
 - execution stops immediately with a clear message if the ICY DLM directory, `icy.dlm`, or `icy.so` is missing or unreadable
