@@ -9,10 +9,11 @@ This repository is being built in the strict order defined by `PLAN.md`.
 - Step 3: kernel loading
 - Step 4: time handling
 - Step 5: single-epoch state-vector retrieval
+- Step 6: geometry conversion
 
 ## Current implemented stage
 
-Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, and **Step 5 - single-epoch state-vector retrieval** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, and **Step 6 - geometry conversion** are implemented.
 
 ## Execution requirements
 
@@ -29,6 +30,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
 - Step 5 state retrieval uses frame `IAU_MARS`, observer `MARS`, target `TGO`, and aberration correction `NONE`.
+- Step 6 geometry uses a documented Mars mean radius of `3389.5 km` for spherical altitude.
 - The repository does not download kernels and does not fall back to guessed paths.
 
 Install the Python YAML module with:
@@ -92,6 +94,17 @@ et_value = NSP_UTC_TO_ET('2025-01-01T00:00:00')
 NSP_STATE_VECTORS, ET=et_value, STATE_VECTOR=state_vector, LIGHT_TIME=light_time
 ```
 
+## Geometry usage
+
+After Step 5 is available, Step 6 geometry conversion can be used with the same ET value:
+
+```idl
+et_value = NSP_UTC_TO_ET('2025-01-01T00:00:00')
+NSP_GEOMETRY, ET=et_value, STATE_VECTOR=state_vector, LONGITUDE=longitude, LATITUDE=latitude, RADIUS=radius, ALTITUDE=altitude
+```
+
+Longitude and latitude are returned in radians. Radius and altitude are returned in kilometers.
+
 ## Tests
 
 Step-specific test routines now live under the repository root `tests/` directory.
@@ -111,6 +124,9 @@ The current test set checks:
 - Step 4 invalid-point-count failure handling
 - Step 5 single-epoch TGO state retrieval against direct `cspice_spkezr`
 - Step 5 invalid-ET failure handling
+- Step 6 spacecraft geometry conversion against direct `cspice_reclat`
+- Step 6 altitude computation from the documented Mars mean radius
+- Step 6 invalid-state failure handling
 
 Expected behavior:
 
@@ -123,4 +139,5 @@ Expected behavior:
 - execution stops immediately with a clear message if `cspice_furnsh` cannot load the resolved meta-kernel
 - execution stops immediately with a clear message if `cspice_str2et` cannot convert the requested UTC string
 - execution stops immediately with a clear message if `cspice_spkezr` cannot retrieve the requested state vector
+- execution stops immediately with a clear message if geometry conversion or `cspice_reclat` validation fails
 - execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass

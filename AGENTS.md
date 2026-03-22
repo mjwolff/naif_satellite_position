@@ -93,6 +93,7 @@ The agent must not add any of the following unless the user explicitly requests 
 - use the `changelog-maintainer` skill at `/Users/mwolff/.codex/skills/changelog-maintainer` when creating or updating `CHANGELOG.md`
 - record only completed, factual changes
 - keep entries concise, chronological, and traceable to the implemented work
+- update the `Completed Steps` section in `README.md` whenever a PLAN step is completed
 
 ---
 
