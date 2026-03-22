@@ -1,3 +1,20 @@
+function resolve_relative_meta_kernel, kernels_path, relative_name
+  compile_opt strictarr
+
+  candidate_path = file_expand_path(kernels_path + '/' + relative_name)
+
+  if ~file_test(candidate_path, /REGULAR) then begin
+    message, 'Step 2 kernel resolution failed: specified meta-kernel was not found beneath KERNELS_PATH: ' + candidate_path, /NONAME
+  endif
+
+  if ~file_test(candidate_path, /READ) then begin
+    message, 'Step 2 kernel resolution failed: specified meta-kernel is not readable: ' + candidate_path, /NONAME
+  endif
+
+  return, candidate_path
+end
+
+
 function resolve_meta_kernel, meta_kernel_name=meta_kernel_name
   compile_opt strictarr
 
@@ -21,37 +38,30 @@ function resolve_meta_kernel, meta_kernel_name=meta_kernel_name
   endif
 
   if strpos(selected_name, '/') ge 0 then begin
-    candidate_path = file_expand_path(kernels_path + '/' + selected_name)
-
-    if ~file_test(candidate_path, /REGULAR) then begin
-      message, 'Step 2 kernel resolution failed: specified meta-kernel was not found beneath KERNELS_PATH: ' + candidate_path, /NONAME
-    endif
-
-    if ~file_test(candidate_path, /READ) then begin
-      message, 'Step 2 kernel resolution failed: specified meta-kernel is not readable: ' + candidate_path, /NONAME
-    endif
-
-    return, candidate_path
+    return, resolve_relative_meta_kernel(kernels_path, selected_name)
   endif
 
-  search_pattern = file_expand_path(kernels_path + '/**/' + selected_name)
-  matches = file_search(search_pattern, /FOLD_CASE)
-  match_count = n_elements(matches)
+  root_candidate = file_expand_path(kernels_path + '/' + selected_name)
+  mk_candidate = file_expand_path(kernels_path + '/mk/' + selected_name)
 
-  if match_count eq 0 then begin
-    message, 'Step 2 kernel resolution failed: no meta-kernel named "' + selected_name + '" was found beneath KERNELS_PATH=' + kernels_path, /NONAME
-  endif
+  root_found = file_test(root_candidate, /REGULAR)
+  mk_found = file_test(mk_candidate, /REGULAR)
 
-  if match_count gt 1 then begin
-    sorted_matches = matches[sort(matches)]
-    diagnostic = 'Step 2 kernel resolution failed: meta-kernel name "' + selected_name + '" is ambiguous beneath KERNELS_PATH. Matching files:'
-    for i = 0L, match_count - 1L do begin
-      diagnostic = diagnostic + string(10B) + '  ' + sorted_matches[i]
-    endfor
+  if ~root_found and ~mk_found then begin
+    diagnostic = 'Step 2 kernel resolution failed: no meta-kernel named "' + selected_name + '" was found in the deterministic search locations beneath KERNELS_PATH=' + kernels_path
+    diagnostic = diagnostic + string(10B) + '  ' + root_candidate
+    diagnostic = diagnostic + string(10B) + '  ' + mk_candidate
     message, diagnostic, /NONAME
   endif
 
-  resolved_path = matches[0]
+  if root_found and mk_found and (root_candidate ne mk_candidate) then begin
+    diagnostic = 'Step 2 kernel resolution failed: meta-kernel name "' + selected_name + '" is ambiguous beneath KERNELS_PATH. Matching files:'
+    diagnostic = diagnostic + string(10B) + '  ' + root_candidate
+    diagnostic = diagnostic + string(10B) + '  ' + mk_candidate
+    message, diagnostic, /NONAME
+  endif
+
+  if root_found then resolved_path = root_candidate else resolved_path = mk_candidate
 
   if ~file_test(resolved_path, /READ) then begin
     message, 'Step 2 kernel resolution failed: resolved meta-kernel is not readable: ' + resolved_path, /NONAME

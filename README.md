@@ -10,6 +10,8 @@ Only **Step 1 - environment validation** and **Step 2 - kernel resolution** are 
 
 - IDL must be invoked with the canonical executable path:
   `/Applications/NV5/idl/bin/idl`
+- In this Codex environment, the canonical launcher may fail before user code runs because its internal architecture probe is sandbox-restricted. For local debugging in that environment, the direct arm64 IDL binary is:
+  `/Applications/NV5/idl92/bin/bin.darwin.arm64/idl`
 - `KERNELS_PATH` must be defined and must point to a readable local kernel root directory.
 - `python3` must be available and able to import the `yaml` module.
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
@@ -28,6 +30,12 @@ Start IDL with the required executable:
 
 ```sh
 /Applications/NV5/idl/bin/idl
+```
+
+If the canonical launcher fails in the Codex sandbox with `Unable to recognize system architecture.`, use the direct binary for debugging there:
+
+```sh
+/Applications/NV5/idl92/bin/bin.darwin.arm64/idl
 ```
 
 From the IDL prompt, change into the repository and compile the current files:
@@ -50,5 +58,5 @@ Expected behavior:
 
 - execution stops immediately with a clear message if `KERNELS_PATH` is missing or invalid
 - execution stops immediately with a clear message if `python3` cannot import `yaml`
-- execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous beneath `KERNELS_PATH`
+- execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous in the deterministic search locations beneath `KERNELS_PATH`
 - execution prints the validated kernel root and the resolved meta-kernel path when the current checks pass
