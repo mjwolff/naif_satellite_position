@@ -1,14 +1,14 @@
-function pipeline_icy_dlm_directory
+function nsp_pipeline_icy_dlm_directory
   compile_opt strictarr
 
   return, '/Users/mwolff/lib/Darwin_arm64'
 end
 
 
-pro initialize_icy_runtime
+pro nsp_initialize_icy_runtime
   compile_opt strictarr
 
-  icy_dlm_directory = pipeline_icy_dlm_directory()
+  icy_dlm_directory = nsp_pipeline_icy_dlm_directory()
   icy_dlm_file = icy_dlm_directory + '/icy.dlm'
   icy_shared_library = icy_dlm_directory + '/icy.so'
   dlm_path_with_separators = ':' + !DLM_PATH + ':'
@@ -38,7 +38,6 @@ pro initialize_icy_runtime
     !DLM_PATH = icy_dlm_directory + ':' + !DLM_PATH
   endif
 
-  ; Trigger DLM loading before kernel operations so failures happen here.
   status = execute("cspice_ktotal, 'ALL', kernel_count")
 
   if status eq 0 then begin
@@ -47,7 +46,7 @@ pro initialize_icy_runtime
 end
 
 
-pro spice_kclear_checked
+pro nsp_spice_kclear_checked
   compile_opt strictarr
 
   status = execute('cspice_kclear')
@@ -57,7 +56,7 @@ pro spice_kclear_checked
 end
 
 
-pro spice_furnsh_checked, meta_kernel_path
+pro nsp_spice_furnsh_checked, meta_kernel_path
   compile_opt strictarr
 
   command = 'cspice_furnsh, meta_kernel_path'
@@ -68,7 +67,7 @@ pro spice_furnsh_checked, meta_kernel_path
 end
 
 
-pro spice_ktotal_checked, kernel_count
+pro nsp_spice_ktotal_checked, kernel_count
   compile_opt strictarr
 
   status = execute("cspice_ktotal, 'ALL', kernel_count")
@@ -78,7 +77,7 @@ pro spice_ktotal_checked, kernel_count
 end
 
 
-pro spice_kdata_checked, kernel_index, file, kernel_type, source_file, handle, found
+pro nsp_spice_kdata_checked, kernel_index, file, kernel_type, source_file, handle, found
   compile_opt strictarr
 
   status = execute("cspice_kdata, kernel_index, 'ALL', file, kernel_type, source_file, handle, found")
@@ -88,15 +87,15 @@ pro spice_kdata_checked, kernel_index, file, kernel_type, source_file, handle, f
 end
 
 
-function is_loaded_meta_kernel, resolved_meta_kernel
+function nsp_is_loaded_meta_kernel, resolved_meta_kernel
   compile_opt strictarr
 
-  spice_ktotal_checked, kernel_count
+  nsp_spice_ktotal_checked, kernel_count
 
   if kernel_count le 0 then return, 0B
 
   for kernel_index = 0L, kernel_count - 1L do begin
-    spice_kdata_checked, kernel_index, file, kernel_type, source_file, handle, found
+    nsp_spice_kdata_checked, kernel_index, file, kernel_type, source_file, handle, found
     if found then begin
       if (file eq resolved_meta_kernel) and (kernel_type eq 'META') then return, 1B
     endif
@@ -106,7 +105,7 @@ function is_loaded_meta_kernel, resolved_meta_kernel
 end
 
 
-pro load_kernels, resolved_meta_kernel, kernel_count=kernel_count
+pro nsp_load_kernels, resolved_meta_kernel, kernel_count=kernel_count
   compile_opt strictarr
 
   if n_elements(resolved_meta_kernel) eq 0 then begin
@@ -136,22 +135,19 @@ pro load_kernels, resolved_meta_kernel, kernel_count=kernel_count
     message, 'Step 3 kernel loading failed: ' + !error_state.msg, /NONAME
   endif
 
-  initialize_icy_runtime
+  nsp_initialize_icy_runtime
+  nsp_spice_kclear_checked
 
-  ; Clear prior kernel state so the load count reflects this step only.
-  spice_kclear_checked
-
-  ; Meta-kernels with relative PATH_VALUES resolve from the current directory.
   cd, meta_kernel_directory
-  spice_furnsh_checked, meta_kernel_path
-  spice_ktotal_checked, kernel_count
+  nsp_spice_furnsh_checked, meta_kernel_path
+  nsp_spice_ktotal_checked, kernel_count
   cd, original_directory
 
   if kernel_count le 0 then begin
     message, 'Step 3 kernel loading failed: cspice_furnsh completed but no kernels are registered in the SPICE kernel pool.', /NONAME
   endif
 
-  if ~is_loaded_meta_kernel(meta_kernel_path) then begin
+  if ~nsp_is_loaded_meta_kernel(meta_kernel_path) then begin
     message, 'Step 3 kernel loading failed: the resolved meta-kernel is not present in the loaded kernel registry: ' + meta_kernel_path, /NONAME
   endif
 

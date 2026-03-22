@@ -135,17 +135,17 @@ mars_spice_pipeline/
 ├── config/
 │   └── tgo_cases.yaml
 ├── src/
-│   ├── load_kernels.pro
-│   ├── resolve_kernels.pro
-│   ├── time_grid.pro
-│   ├── state_vectors.pro
-│   ├── geometry.pro
-│   ├── solar_geometry.pro
-│   ├── occultation.pro
-│   ├── export_csv.pro
-│   └── validate_outputs.pro
-├── run_pipeline.pro
-├── run_batch.pro
+│   ├── nsp_load_kernels.pro
+│   ├── nsp_resolve_kernels.pro
+│   ├── nsp_time_grid.pro
+│   ├── nsp_state_vectors.pro
+│   ├── nsp_geometry.pro
+│   ├── nsp_solar_geometry.pro
+│   ├── nsp_occultation.pro
+│   ├── nsp_export_csv.pro
+│   └── nsp_validate_outputs.pro
+├── nsp_run_pipeline.pro
+├── nsp_run_batch.pro
 └── outputs/
 ```
 
@@ -192,7 +192,7 @@ Implement code that:
 - keeps the loading logic isolated from science calculations
 
 Deliverable:
-- `load_kernels.pro`
+- `nsp_load_kernels.pro`
 
 ### Step 4 — time handling
 Implement code that:
@@ -213,7 +213,7 @@ Implement code that:
 - prints or records the result for one epoch
 
 Deliverable:
-- `state_vectors.pro` with single-epoch test
+- `nsp_state_vectors.pro` with single-epoch test
 
 ### Step 6 — geometry conversion
 Implement code that:
@@ -223,7 +223,7 @@ Implement code that:
 - performs validation against `cspice_reclat`
 
 Deliverable:
-- `geometry.pro`
+- `nsp_geometry.pro`
 
 ### Step 7 — solar geometry
 Implement code that:
@@ -233,7 +233,7 @@ Implement code that:
 - validates sign and angle ranges where practical
 
 Deliverable:
-- `solar_geometry.pro`
+- `nsp_solar_geometry.pro`
 
 ### Step 8 — occultation geometry
 Implement code that:
@@ -244,7 +244,7 @@ Implement code that:
 - flags geometrically invalid or non-occultation cases cleanly
 
 Deliverable:
-- `occultation.pro`
+- `nsp_occultation.pro`
 
 ### Step 9 — export
 Implement code that:
@@ -254,7 +254,7 @@ Implement code that:
 - includes enough metadata columns for traceability
 
 Deliverable:
-- `export_csv.pro`
+- `nsp_export_csv.pro`
 
 ### Step 10 — batch execution
 Implement code that:
@@ -265,7 +265,7 @@ Implement code that:
 - writes separate outputs per case
 
 Deliverable:
-- `run_batch.pro`
+- `nsp_`
 
 ### Step 11 — integrated validation pass
 Implement code that:
@@ -277,7 +277,7 @@ Implement code that:
 - reports failures clearly
 
 Deliverable:
-- `validate_outputs.pro`
+- `nsp_validate_outputs.pro`
 
 ---
 
@@ -385,14 +385,14 @@ Do not overwhelm the user with excessive debug output unless explicitly requeste
 The canonical invocation shall be documented as:
 
 ```bash
-/Applications/NV5/idl/bin/idl run_pipeline.pro
+/Applications/NV5/idl/bin/idl nsp_run_pipeline.pro
 ```
 
 ### 11.2 Batch run
 The canonical batch invocation shall be documented as:
 
 ```bash
-/Applications/NV5/idl/bin/idl run_batch.pro
+/Applications/NV5/idl/bin/idl nsp_
 ```
 
 No alternative primary execution path should be introduced for the base pipeline.

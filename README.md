@@ -4,7 +4,7 @@ This repository is being built in the strict order defined by `PLAN.md`.
 
 ## Current implemented stage
 
-Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, and **Step 3 - kernel loading** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, and **Step 4 - time handling** are implemented.
 
 ## Execution requirements
 
@@ -14,8 +14,9 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, and **
   `/Applications/NV5/idl92/bin/bin.darwin.arm64/idl`
 - `KERNELS_PATH` must be defined and must point to a readable local kernel root directory.
 - `python3` must be available and able to import the `yaml` module.
-- The local ICY DLM must be available in:
+- The local ICY DLM directory, descriptor, and shared library must be available in:
   `/Users/mwolff/lib/Darwin_arm64`
+- `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
 - The repository does not download kernels and does not fall back to guessed paths.
@@ -40,27 +41,45 @@ If the canonical launcher fails in the Codex sandbox with `Unable to recognize s
 /Applications/NV5/idl92/bin/bin.darwin.arm64/idl
 ```
 
-From the IDL prompt, change into the repository and compile the current files:
+From the IDL prompt, change into the repository and compile only the entrypoint:
 
 ```idl
 CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
-.COMPILE 'src/validate_environment.pro'
-.COMPILE 'src/resolve_kernels.pro'
-.COMPILE 'src/load_kernels.pro'
-.COMPILE 'run_pipeline.pro'
-RUN_PIPELINE
+.COMPILE 'nsp_run_pipeline.pro'
+NSP_RUN_PIPELINE
 ```
 
 To resolve a different meta-kernel name, pass it explicitly:
 
 ```idl
-RUN_PIPELINE, META_KERNEL_NAME='some_other.tm'
+NSP_RUN_PIPELINE, META_KERNEL_NAME='some_other.tm'
+```
+
+## Time handling usage
+
+After `NSP_RUN_PIPELINE` has loaded kernels and added `src/` to `!PATH`, Step 4 helpers can be used directly:
+
+```idl
+et_value = NSP_UTC_TO_ET('2025-01-01T00:00:00')
+print, et_value
+
+grid = NSP_BUILD_TIME_GRID('2025-01-01T00:00:00', 60D, 3L)
+print, grid
+```
+
+Or use the reporting procedure:
+
+```idl
+NSP_TIME_GRID, START_UTC='2025-01-01T00:00:00', STEP_SECONDS=60D, POINT_COUNT=3L, ET_VALUES=grid
 ```
 
 Expected behavior:
 
+- execution stops immediately with a clear message if `src/` is not available from the current working directory
 - execution stops immediately with a clear message if `KERNELS_PATH` is missing or invalid
 - execution stops immediately with a clear message if `python3` cannot import `yaml`
+- execution stops immediately with a clear message if the ICY DLM directory, `icy.dlm`, or `icy.so` is missing or unreadable
 - execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous in the deterministic search locations beneath `KERNELS_PATH`
-- execution stops immediately with a clear message if the ICY DLM is missing or if `cspice_furnsh` cannot load the resolved meta-kernel
+- execution stops immediately with a clear message if `cspice_furnsh` cannot load the resolved meta-kernel
+- execution stops immediately with a clear message if `cspice_str2et` cannot convert the requested UTC string
 - execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass

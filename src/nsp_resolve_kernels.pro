@@ -1,4 +1,4 @@
-function resolve_relative_meta_kernel, kernels_path, relative_name
+function nsp_resolve_relative_meta_kernel, kernels_path, relative_name
   compile_opt strictarr
 
   candidate_path = file_expand_path(kernels_path + '/' + relative_name)
@@ -15,7 +15,7 @@ function resolve_relative_meta_kernel, kernels_path, relative_name
 end
 
 
-function resolve_meta_kernel, meta_kernel_name=meta_kernel_name
+function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name
   compile_opt strictarr
 
   kernels_path = strtrim(getenv('KERNELS_PATH'), 2)
@@ -38,7 +38,7 @@ function resolve_meta_kernel, meta_kernel_name=meta_kernel_name
   endif
 
   if strpos(selected_name, '/') ge 0 then begin
-    return, resolve_relative_meta_kernel(kernels_path, selected_name)
+    return, nsp_resolve_relative_meta_kernel(kernels_path, selected_name)
   endif
 
   root_candidate = file_expand_path(kernels_path + '/' + selected_name)
@@ -71,10 +71,10 @@ function resolve_meta_kernel, meta_kernel_name=meta_kernel_name
 end
 
 
-pro resolve_kernels, meta_kernel_name=meta_kernel_name, resolved_meta_kernel=resolved_meta_kernel
+pro nsp_resolve_kernels, meta_kernel_name=meta_kernel_name, resolved_meta_kernel=resolved_meta_kernel
   compile_opt strictarr
 
-  resolved_meta_kernel = resolve_meta_kernel(meta_kernel_name=meta_kernel_name)
+  resolved_meta_kernel = nsp_resolve_meta_kernel(meta_kernel_name=meta_kernel_name)
 
   print, 'Step 2 kernel resolution passed.'
   print, 'Resolved meta-kernel=' + resolved_meta_kernel
