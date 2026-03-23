@@ -2,11 +2,11 @@ pro nsp_print_test_results_table, test_names, test_counts, pass_counts, fail_cou
   compile_opt strictarr
 
   print, 'Test Results'
-  print, 'Test Name | Total | Pass | Fail'
-  print, '--- | ---: | ---: | ---:'
+  print, string('Test Name', 'Total', 'Pass', 'Fail', format='(A24,2X,A5,2X,A4,2X,A4)')
+  print, '------------------------  -----  ----  ----'
 
   for i = 0L, n_elements(test_names) - 1L do begin
-    print, test_names[i] + ' | ' + strtrim(test_counts[i], 2) + ' | ' + strtrim(pass_counts[i], 2) + ' | ' + strtrim(fail_counts[i], 2)
+    print, string(test_names[i], test_counts[i], pass_counts[i], fail_counts[i], format='(A24,2X,I5,2X,I4,2X,I4)')
   endfor
 end
 
