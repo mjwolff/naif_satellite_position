@@ -14,10 +14,11 @@ This repository is being built in the strict order defined by `PLAN.md`.
 - Step 8: occultation geometry
 - Step 9: CSV export
 - Step 10: batch execution
+- Step 11: integrated validation pass
 
 ## Current implemented stage
 
-Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, **Step 6 - geometry conversion**, **Step 7 - solar geometry**, **Step 8 - occultation geometry**, **Step 9 - CSV export**, and **Step 10 - batch execution** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, **Step 6 - geometry conversion**, **Step 7 - solar geometry**, **Step 8 - occultation geometry**, **Step 9 - CSV export**, **Step 10 - batch execution**, and **Step 11 - integrated validation pass** are implemented.
 
 ## Execution requirements
 
@@ -41,6 +42,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - Step 7 solar geometry uses frame `IAU_MARS`, observer `MARS`, target `SUN`, aberration correction `NONE`, and reports a spacecraft-local solar zenith angle defined between the outward radial vector and the spacecraft-to-Sun direction.
 - Step 8 occultation geometry treats the initial tangent point as the minimum-radius point on the spacecraft-to-Sun line and flags non-occultation cases explicitly instead of returning misleading tangent geometry.
 - Optional Keplerian-element export is available in Step 9 only when explicitly requested, and those elements are derived from a separate Mars-centered `J2000` state rather than the rotating `IAU_MARS` state.
+- Step 11 validates the integrated output bundle before CSV writing, including required finiteness, solar-angle range checks, and tangent-geometry consistency.
 - The repository does not download kernels and does not fall back to guessed paths.
 
 Install the Python YAML module with:
@@ -218,6 +220,7 @@ The current test set checks:
 - Step 9 optional Keplerian-element export from a separate Mars-centered `J2000` state
 - Step 10 deterministic batch execution from YAML case definitions
 - Step 10 isolated per-case failures with continued execution of later cases
+- Step 11 integrated output finiteness and plausibility validation
 
 Expected behavior:
 
@@ -234,6 +237,7 @@ Expected behavior:
 - execution stops immediately with a clear message if geometry conversion or `cspice_reclat` validation fails
 - execution stops immediately with a clear message if Sun state retrieval or solar geometry validation fails
 - execution stops immediately with a clear message if occultation geometry construction fails
+- execution stops immediately with a clear message if integrated output validation fails
 - execution stops immediately with a clear message if CSV export or optional Keplerian-element export fails
 - batch execution continues past a failed case, reports that case explicitly, and still writes outputs for later successful cases
 - execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass

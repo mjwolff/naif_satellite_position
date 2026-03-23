@@ -28,3 +28,5 @@
 - Added Step 9 tests for fixed-schema CSV writing and optional Keplerian-element export.
 - Implemented Step 10 deterministic batch execution from YAML case definitions in `config/` with one CSV export per successful case.
 - Added Step 10 tests for stable case ordering, per-case output creation, and isolated failed-case handling.
+- Implemented Step 11 integrated output validation before successful export, including finiteness, angle-range, and tangent-geometry consistency checks.
+- Added Step 11 tests for valid output bundles plus expected failures for non-finite values, invalid solar angles, and inconsistent non-occultation geometry.
