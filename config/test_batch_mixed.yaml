@@ -1,0 +1,10 @@
+cases:
+  - case_id: batch_mixed_a
+    utc: '2025-01-01T00:00:00'
+    output_filename: batch_mixed_a.csv
+  - case_id: batch_mixed_bad
+    utc: 'not-a-valid-utc'
+    output_filename: batch_mixed_bad.csv
+  - case_id: batch_mixed_c
+    utc: '2025-01-01T00:20:00'
+    output_filename: batch_mixed_c.csv

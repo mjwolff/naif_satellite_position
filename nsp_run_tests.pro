@@ -31,4 +31,5 @@ pro nsp_run_tests
   nsp_test_solar_geometry
   nsp_test_occultation
   nsp_test_export_csv
+  nsp_test_batch
 end

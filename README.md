@@ -13,10 +13,11 @@ This repository is being built in the strict order defined by `PLAN.md`.
 - Step 7: solar geometry
 - Step 8: occultation geometry
 - Step 9: CSV export
+- Step 10: batch execution
 
 ## Current implemented stage
 
-Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, **Step 6 - geometry conversion**, **Step 7 - solar geometry**, **Step 8 - occultation geometry**, and **Step 9 - CSV export** are implemented.
+Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step 3 - kernel loading**, **Step 4 - time handling**, **Step 5 - single-epoch state-vector retrieval**, **Step 6 - geometry conversion**, **Step 7 - solar geometry**, **Step 8 - occultation geometry**, **Step 9 - CSV export**, and **Step 10 - batch execution** are implemented.
 
 ## Execution requirements
 
@@ -29,8 +30,10 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - The local ICY DLM directory, descriptor, and shared library must be available in:
   `/Users/mwolff/lib/Darwin_arm64`
 - `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
+- `nsp_run_batch.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
 - `nsp_run_tests.pro` expects to be launched from the repository root so it can add both `src/` and `tests/` to `!PATH` automatically.
 - Repository exports are written beneath the root `outputs/` directory.
+- Batch case definitions are read from repository YAML configuration beneath `config/`.
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
 - Step 5 state retrieval uses frame `IAU_MARS`, observer `MARS`, target `TGO`, and aberration correction `NONE`.
@@ -161,6 +164,28 @@ The optional Keplerian columns are appended in this order:
 kep_rp_km,kep_eccentricity,kep_inclination_rad,kep_longitude_of_ascending_node_rad,kep_argument_of_periapsis_rad,kep_mean_anomaly_rad,kep_epoch_et,kep_mu_km3_s2
 ```
 
+## Batch usage
+
+Step 10 batch execution reads deterministic case definitions from `config/tgo_cases.yaml` by default and writes one CSV per successful case beneath `outputs/`:
+
+```idl
+CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
+.COMPILE 'nsp_run_batch.pro'
+NSP_RUN_BATCH
+```
+
+The batch configuration format is:
+
+```yaml
+cases:
+  - case_id: some_case_id
+    utc: '2025-01-01T00:00:00'
+    output_filename: some_case_id.csv
+    include_keplerian_elements: false
+```
+
+`case_id` and `utc` are required. `output_filename` is optional and defaults to `case_id + '.csv'`. `include_keplerian_elements` is optional and defaults to `false`. Batch cases are executed in the YAML list order, and one failed case is reported explicitly without preventing later cases from running.
+
 ## Tests
 
 Step-specific test routines now live under the repository root `tests/` directory.
@@ -191,6 +216,8 @@ The current test set checks:
 - Step 8 invalid-spacecraft-state failure handling
 - Step 9 fixed-schema CSV export under `outputs/`
 - Step 9 optional Keplerian-element export from a separate Mars-centered `J2000` state
+- Step 10 deterministic batch execution from YAML case definitions
+- Step 10 isolated per-case failures with continued execution of later cases
 
 Expected behavior:
 
@@ -208,4 +235,5 @@ Expected behavior:
 - execution stops immediately with a clear message if Sun state retrieval or solar geometry validation fails
 - execution stops immediately with a clear message if occultation geometry construction fails
 - execution stops immediately with a clear message if CSV export or optional Keplerian-element export fails
+- batch execution continues past a failed case, reports that case explicitly, and still writes outputs for later successful cases
 - execution prints the validated kernel root, the resolved meta-kernel path, and the loaded kernel count when the current checks pass

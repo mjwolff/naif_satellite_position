@@ -26,3 +26,5 @@
 - Implemented Step 9 fixed-schema CSV export beneath `outputs/`.
 - Added optional Keplerian-element export using a separate Mars-centered `J2000` state so rotating-frame `IAU_MARS` geometry is not reused for osculating elements.
 - Added Step 9 tests for fixed-schema CSV writing and optional Keplerian-element export.
+- Implemented Step 10 deterministic batch execution from YAML case definitions in `config/` with one CSV export per successful case.
+- Added Step 10 tests for stable case ordering, per-case output creation, and isolated failed-case handling.

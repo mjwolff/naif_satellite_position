@@ -267,7 +267,7 @@ Implement code that:
 - writes separate outputs per case
 
 Deliverable:
-- `nsp_`
+- `nsp_run_batch.pro`
 
 ### Step 11 — integrated validation pass
 Implement code that:
