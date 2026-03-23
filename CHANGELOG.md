@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-03-23
+- 2026-03-23 12:33:32 CET commit b59e2a3: Use post-commit hook for changelog timestamps
+
+
 ## 2026-03-22
 - Updated Step 9 planning so Keplerian elements can be calculated and exported optionally when explicitly requested, without making them mandatory for every run.
 - Added strict Step 1 environment validation for `KERNELS_PATH`, `python3` YAML-module availability, and local ICY DLM files.
