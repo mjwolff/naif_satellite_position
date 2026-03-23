@@ -9,6 +9,7 @@
 - 2026-03-23 12:46:14 CET commit: Add configurable ICY_DLM_PATH resolution
 - 2026-03-23 12:55:29 CET commit: Add per-suite test results table
 - 2026-03-23 13:03:22 CET commit: testing commit-msg script.
+- 2026-03-23 18:54:42 CET commit: Add shared IDL path setup helper
 
 
 ## 2026-03-22
