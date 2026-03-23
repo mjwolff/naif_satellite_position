@@ -33,6 +33,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
 - `nsp_run_batch.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
 - `nsp_run_tests.pro` expects to be launched from the repository root so it can add both `src/` and `tests/` to `!PATH` automatically.
+- Root-level `nsp_setup_path.pro` provides the shared `!PATH` setup used by the repository entrypoints.
 - Repository exports are written beneath the root `outputs/` directory.
 - Batch case definitions are read from repository YAML configuration beneath `config/`.
 - Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
@@ -71,6 +72,14 @@ From the IDL prompt, change into the repository and compile only the entrypoint:
 CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
 .COMPILE 'nsp_run_pipeline.pro'
 NSP_RUN_PIPELINE
+```
+
+To set up the repository autoload path explicitly before compiling other routines:
+
+```idl
+CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
+.COMPILE 'nsp_setup_path.pro'
+NSP_SETUP_PATH
 ```
 
 To override the ICY DLM path explicitly, pass the `ICY_DLM_PATH` keyword:

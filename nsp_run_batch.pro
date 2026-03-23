@@ -1,17 +1,7 @@
 pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path, global_include_keplerian_elements=global_include_keplerian_elements, success_count=success_count, failure_count=failure_count, succeeded_case_ids=succeeded_case_ids, failed_case_ids=failed_case_ids, output_paths=output_paths
   compile_opt strictarr
 
-  src_directory = file_expand_path('src')
-  path_with_separators = ':' + !PATH + ':'
-  src_with_separators = ':' + src_directory + ':'
-
-  if ~file_test(src_directory, /DIRECTORY) then begin
-    message, 'nsp_run_batch failed: required source directory was not found relative to the current working directory: ' + src_directory, /NONAME
-  endif
-
-  if strpos(path_with_separators, src_with_separators) lt 0 then begin
-    !PATH = src_directory + ':' + !PATH
-  endif
+  nsp_setup_path
 
   nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path
   nsp_read_batch_cases, config_path=config_path, case_ids=case_ids, utc_strings=utc_strings, include_keplerian_values=include_keplerian_values, output_filenames=output_filenames

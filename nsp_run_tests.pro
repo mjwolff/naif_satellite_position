@@ -14,28 +14,7 @@ end
 pro nsp_run_tests, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
-  src_directory = file_expand_path('src')
-  tests_directory = file_expand_path('tests')
-  path_with_separators = ':' + !PATH + ':'
-  src_with_separators = ':' + src_directory + ':'
-  tests_with_separators = ':' + tests_directory + ':'
-
-  if ~file_test(src_directory, /DIRECTORY) then begin
-    message, 'nsp_run_tests failed: required source directory was not found relative to the current working directory: ' + src_directory, /NONAME
-  endif
-
-  if ~file_test(tests_directory, /DIRECTORY) then begin
-    message, 'nsp_run_tests failed: required tests directory was not found relative to the current working directory: ' + tests_directory, /NONAME
-  endif
-
-  if strpos(path_with_separators, src_with_separators) lt 0 then begin
-    !PATH = src_directory + ':' + !PATH
-    path_with_separators = ':' + !PATH + ':'
-  endif
-
-  if strpos(path_with_separators, tests_with_separators) lt 0 then begin
-    !PATH = tests_directory + ':' + !PATH
-  endif
+  nsp_setup_path, /include_tests
 
   test_names = ['Step 4 Time Handling', 'Step 5 State Vectors', 'Step 6 Geometry', 'Step 7 Solar Geometry', 'Step 8 Occultation', 'Step 9 Export', 'Step 10 Batch', 'Step 11 Validation']
   test_counts = [4L, 2L, 2L, 2L, 4L, 2L, 2L, 4L]

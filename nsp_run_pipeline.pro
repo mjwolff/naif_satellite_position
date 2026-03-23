@@ -1,17 +1,7 @@
 pro nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
-  src_directory = file_expand_path('src')
-  path_with_separators = ':' + !PATH + ':'
-  src_with_separators = ':' + src_directory + ':'
-
-  if ~file_test(src_directory, /DIRECTORY) then begin
-    message, 'nsp_run_pipeline failed: required source directory was not found relative to the current working directory: ' + src_directory, /NONAME
-  endif
-
-  if strpos(path_with_separators, src_with_separators) lt 0 then begin
-    !PATH = src_directory + ':' + !PATH
-  endif
+  nsp_setup_path
 
   nsp_validate_environment, icy_dlm_path=icy_dlm_path
   nsp_resolve_kernels, meta_kernel_name=meta_kernel_name, resolved_meta_kernel=resolved_meta_kernel

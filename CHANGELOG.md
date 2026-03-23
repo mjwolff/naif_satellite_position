@@ -3,6 +3,7 @@
 ## 2026-03-23
 - 2026-03-23 12:33:32 CET commit b59e2a3: Use post-commit hook for changelog timestamps
 - 2026-03-23 12:34:02 CET commit feb0227: Record hook-generated changelog timestamp
+- Added root-level `nsp_setup_path.pro` so repository entrypoints share one strict `!PATH` setup routine for `src/` and optional `tests/`.
 - Added `ICY_DLM_PATH` resolution precedence for validation and kernel loading: IDL keyword first, then environment variable, then the existing hardwired default path.
 - Documented the new `ICY_DLM_PATH` keyword and environment-variable override behavior in `README.md`.
 - 2026-03-23 12:46:14 CET commit: Add configurable ICY_DLM_PATH resolution
