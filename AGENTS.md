@@ -90,9 +90,9 @@ The agent must not add any of the following unless the user explicitly requests 
 
 ### 4.4 Changelog discipline
 - maintain `CHANGELOG.md` at the repository root for meaningful repository changes
-- use the `changelog-maintainer` skill at `/Users/mwolff/.codex/skills/changelog-maintainer` when creating or updating `CHANGELOG.md`
-- record only completed, factual changes
-- keep entries concise, chronological, and traceable to the implemented work
+- a local Git `post-commit` hook is responsible for appending timestamped commit entries to `CHANGELOG.md`
+- when editing `CHANGELOG.md` directly, record only completed, factual changes
+- when editing `CHANGELOG.md` directly, keep entries concise, chronological, and traceable to the implemented work
 - update the `Completed Steps` section in `README.md` whenever a PLAN step is completed
 
 ---
