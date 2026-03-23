@@ -1,14 +1,7 @@
-function nsp_pipeline_icy_dlm_directory
+pro nsp_initialize_icy_runtime, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
-  return, '/Users/mwolff/lib/Darwin_arm64'
-end
-
-
-pro nsp_initialize_icy_runtime
-  compile_opt strictarr
-
-  icy_dlm_directory = nsp_pipeline_icy_dlm_directory()
+  icy_dlm_directory = nsp_resolve_icy_dlm_path(icy_dlm_path=icy_dlm_path)
   icy_dlm_file = icy_dlm_directory + '/icy.dlm'
   icy_shared_library = icy_dlm_directory + '/icy.so'
   dlm_path_with_separators = ':' + !DLM_PATH + ':'
@@ -105,7 +98,7 @@ function nsp_is_loaded_meta_kernel, resolved_meta_kernel
 end
 
 
-pro nsp_load_kernels, resolved_meta_kernel, kernel_count=kernel_count
+pro nsp_load_kernels, resolved_meta_kernel, kernel_count=kernel_count, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
   if n_elements(resolved_meta_kernel) eq 0 then begin
@@ -137,7 +130,7 @@ pro nsp_load_kernels, resolved_meta_kernel, kernel_count=kernel_count
   endif
 
   dummy_meta_kernel_path = nsp_loaded_meta_kernel_path(/clear)
-  nsp_initialize_icy_runtime
+  nsp_initialize_icy_runtime, icy_dlm_path=icy_dlm_path
   nsp_spice_kclear_checked
 
   cd, meta_kernel_directory

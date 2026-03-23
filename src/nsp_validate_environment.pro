@@ -1,10 +1,3 @@
-function nsp_validation_icy_dlm_directory
-  compile_opt strictarr
-
-  return, '/Users/mwolff/lib/Darwin_arm64'
-end
-
-
 pro nsp_validate_python_yaml_environment
   compile_opt strictarr
 
@@ -16,10 +9,10 @@ pro nsp_validate_python_yaml_environment
 end
 
 
-pro nsp_validate_icy_environment
+pro nsp_validate_icy_environment, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
-  icy_dlm_directory = nsp_validation_icy_dlm_directory()
+  icy_dlm_directory = nsp_resolve_icy_dlm_path(icy_dlm_path=icy_dlm_path)
   icy_dlm_file = icy_dlm_directory + '/icy.dlm'
   icy_shared_library = icy_dlm_directory + '/icy.so'
 
@@ -49,7 +42,7 @@ pro nsp_validate_icy_environment
 end
 
 
-pro nsp_validate_environment
+pro nsp_validate_environment, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
   kernels_path = strtrim(getenv('KERNELS_PATH'), 2)
@@ -67,10 +60,10 @@ pro nsp_validate_environment
   endif
 
   nsp_validate_python_yaml_environment
-  nsp_validate_icy_environment
+  nsp_validate_icy_environment, icy_dlm_path=icy_dlm_path
 
   print, 'Step 1 environment validation passed.'
   print, 'KERNELS_PATH=' + kernels_path
   print, 'python3 yaml module=available'
-  print, 'ICY DLM directory=' + nsp_validation_icy_dlm_directory()
+  print, 'ICY DLM directory=' + nsp_resolve_icy_dlm_path(icy_dlm_path=icy_dlm_path)
 end

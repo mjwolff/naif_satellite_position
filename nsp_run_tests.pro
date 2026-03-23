@@ -1,4 +1,4 @@
-pro nsp_run_tests
+pro nsp_run_tests, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
   src_directory = file_expand_path('src')
@@ -24,7 +24,7 @@ pro nsp_run_tests
     !PATH = tests_directory + ':' + !PATH
   endif
 
-  nsp_run_pipeline
+  nsp_run_pipeline, icy_dlm_path=icy_dlm_path
   nsp_test_time_handling
   nsp_test_state_vectors
   nsp_test_geometry

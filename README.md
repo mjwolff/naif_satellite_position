@@ -28,8 +28,8 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
   `/Applications/NV5/idl92/bin/bin.darwin.arm64/idl`
 - `KERNELS_PATH` must be defined and must point to a readable local kernel root directory.
 - `python3` must be available and able to import the `yaml` module.
-- The local ICY DLM directory, descriptor, and shared library must be available in:
-  `/Users/mwolff/lib/Darwin_arm64`
+- The ICY DLM path is resolved in this order: IDL keyword `ICY_DLM_PATH`, environment variable `ICY_DLM_PATH`, then the default `/Users/mwolff/lib/Darwin_arm64`.
+- The resolved ICY DLM directory, descriptor, and shared library must all exist and be readable.
 - `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
 - `nsp_run_batch.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
 - `nsp_run_tests.pro` expects to be launched from the repository root so it can add both `src/` and `tests/` to `!PATH` automatically.
@@ -73,10 +73,22 @@ CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_positio
 NSP_RUN_PIPELINE
 ```
 
+To override the ICY DLM path explicitly, pass the `ICY_DLM_PATH` keyword:
+
+```idl
+NSP_RUN_PIPELINE, ICY_DLM_PATH='/Users/mwolff/lib/Darwin_arm64'
+```
+
 To resolve a different meta-kernel name, pass it explicitly:
 
 ```idl
 NSP_RUN_PIPELINE, META_KERNEL_NAME='some_other.tm'
+```
+
+Or set the same name in the environment before starting IDL:
+
+```sh
+export ICY_DLM_PATH=/Users/mwolff/lib/Darwin_arm64
 ```
 
 ## Time handling usage
@@ -175,6 +187,8 @@ CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_positio
 .COMPILE 'nsp_run_batch.pro'
 NSP_RUN_BATCH
 ```
+
+Batch execution accepts the same optional `ICY_DLM_PATH` keyword and environment-variable override used by `NSP_RUN_PIPELINE`.
 
 The batch configuration format is:
 
