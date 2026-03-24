@@ -24,7 +24,7 @@ Both are authoritative.
 ### 2.2 Respect strict environment assumptions
 - never download kernels
 - never access network resources for SPICE data
-- always use `KERNELS_PATH` as the root for all kernel discovery
+- always use `KERNEL_PATH` as the root for all kernel discovery
 - always assume the canonical IDL executable is:
   `/Applications/NV5/idl/bin/idl`
 - never assume `idl` is on `PATH`
@@ -160,7 +160,7 @@ Examples:
 
 ### 7.2 Mandatory checks
 The agent must include or preserve checks for:
-- defined and readable `KERNELS_PATH`
+- defined and readable `KERNEL_PATH`
 - required kernel existence
 - successful SPICE kernel load
 - finite state vectors
@@ -293,7 +293,7 @@ The agent should consider the base strict-mode implementation complete only when
 
 - the first-priority PLAN goals are implemented
 - the code runs end-to-end using the documented IDL path
-- local kernels are resolved only through `KERNELS_PATH`
+- local kernels are resolved only through `KERNEL_PATH`
 - validation checks are present and pass for the tested cases
 - outputs are structured and traceable
 - no prohibited shortcuts were used

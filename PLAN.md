@@ -27,7 +27,7 @@ All required NAIF kernels are assumed to already exist on the local system.
 
 The kernel root directory is provided by the environment variable:
 
-`KERNELS_PATH`
+`KERNEL_PATH`
 
 Rules:
 
@@ -35,7 +35,7 @@ Rules:
 - never clone kernel repositories
 - never fetch files from NAIF or any other network source
 - never create a replacement local kernel cache inside the repository
-- always resolve kernel paths from `KERNELS_PATH`
+- always resolve kernel paths from `KERNEL_PATH`
 
 ### 2.2 IDL location
 The IDL executable is fixed and must be treated as authoritative:
@@ -55,7 +55,7 @@ Rules:
 - use absolute paths whenever practical
 - fail early if a required path is missing
 - do not silently fall back to guessed paths
-- do not hard-code user-specific kernel subdirectories unless they are explicitly discovered under `KERNELS_PATH`
+- do not hard-code user-specific kernel subdirectories unless they are explicitly discovered under `KERNEL_PATH`
 
 ### 2.4 Repository behavior
 Rules:
@@ -164,7 +164,7 @@ The build must proceed in the following order unless the user explicitly overrid
 ### Step 1 — environment validation
 Implement code that:
 
-- reads `KERNELS_PATH`
+- reads `KERNEL_PATH`
 - verifies it is non-empty
 - verifies the directory exists
 - verifies the fixed IDL path assumption is documented in execution instructions
@@ -176,7 +176,7 @@ Deliverable:
 ### Step 2 — kernel resolution
 Implement code that:
 
-- locates required kernel files or a usable meta-kernel beneath `KERNELS_PATH`
+- locates required kernel files or a usable meta-kernel beneath `KERNEL_PATH`
 - resolves absolute paths
 - distinguishes between required and optional kernels
 - emits clear diagnostics when required files are missing
@@ -322,7 +322,7 @@ Rules:
 The following checks are mandatory for strict mode.
 
 ### 8.1 Environment checks
-- `KERNELS_PATH` exists and is readable
+- `KERNEL_PATH` exists and is readable
 - required kernel files exist
 - output directory exists or is created intentionally
 
@@ -369,7 +369,7 @@ The implementation should provide concise but useful diagnostics.
 
 At minimum, log:
 
-- the resolved `KERNELS_PATH`
+- the resolved `KERNEL_PATH`
 - whether a meta-kernel was found or generated
 - the primary kernels selected
 - the current case identifier
@@ -407,8 +407,8 @@ The first implementation task is deliberately narrow.
 
 Implement:
 
-1. environment validation for `KERNELS_PATH`
-2. kernel discovery or meta-kernel discovery beneath `KERNELS_PATH`
+1. environment validation for `KERNEL_PATH`
+2. kernel discovery or meta-kernel discovery beneath `KERNEL_PATH`
 3. kernel loading
 4. one single-epoch TGO state-vector retrieval
 5. direct printing or recording of that result

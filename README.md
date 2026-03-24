@@ -26,7 +26,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
   `/Applications/NV5/idl/bin/idl`
 - In this Codex environment, the canonical launcher may fail before user code runs because its internal architecture probe is sandbox-restricted. For local debugging in that environment, the direct arm64 IDL binary is:
   `/Applications/NV5/idl92/bin/bin.darwin.arm64/idl`
-- `KERNELS_PATH` must be defined and must point to a readable local kernel root directory.
+- `KERNEL_PATH` must be defined and must point to a readable local kernel root directory.
 - The native IDL `YAML_PARSE` routine must be available from the installed IDL distribution.
 - The ICY DLM path is resolved in this order: IDL keyword `ICY_DLM_PATH`, environment variable `ICY_DLM_PATH`, then the default `/Users/mwolff/lib/Darwin_arm64`.
 - The resolved ICY DLM directory, descriptor, and shared library must all exist and be readable.
@@ -36,7 +36,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - Root-level `nsp_setup_path.pro` provides the shared `!PATH` setup used by the repository entrypoints.
 - Repository exports are written beneath the root `outputs/` directory.
 - Batch case definitions are read from repository YAML configuration beneath `config/`.
-- Meta-kernel resolution is performed only beneath `KERNELS_PATH`.
+- Meta-kernel resolution is performed only beneath `KERNEL_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
 - Step 5 state retrieval uses frame `IAU_MARS`, observer `MARS`, target `TGO`, and aberration correction `NONE`.
 - Step 6 geometry uses a documented Mars mean radius of `3389.5 km` for spherical altitude.
@@ -275,10 +275,10 @@ Expected behavior:
 - execution stops immediately with a clear message if `src/` is not available from the current working directory
 - execution stops immediately with a clear message if `tests/` is not available from the current working directory
 - execution stops immediately with a clear message if `outputs/` is not available from the current working directory
-- execution stops immediately with a clear message if `KERNELS_PATH` is missing or invalid
+- execution stops immediately with a clear message if `KERNEL_PATH` is missing or invalid
 - execution stops immediately with a clear message if the native IDL `YAML_PARSE` routine is unavailable
 - execution stops immediately with a clear message if the ICY DLM directory, `icy.dlm`, or `icy.so` is missing or unreadable
-- execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous in the deterministic search locations beneath `KERNELS_PATH`
+- execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous in the deterministic search locations beneath `KERNEL_PATH`
 - execution stops immediately with a clear message if `cspice_furnsh` cannot load the resolved meta-kernel
 - execution stops immediately with a clear message if `cspice_str2et` cannot convert the requested UTC string
 - execution stops immediately with a clear message if `cspice_spkezr` cannot retrieve the requested state vector

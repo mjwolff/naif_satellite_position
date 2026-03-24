@@ -18,6 +18,7 @@
 - 2026-03-24 15:35:12 CET commit: Write batch results to a single CSV
 - 2026-03-24 15:36:17 CET commit: Record changelog timestamp for batch CSV output
 - 2026-03-24 15:54:24 CET commit: Format and document batch runner
+- 2026-03-24 16:19:23 CET commit: Add routine docs to batch runner
 
 
 ## 2026-03-23
@@ -37,8 +38,8 @@
 
 ## 2026-03-22
 - Updated Step 9 planning so Keplerian elements can be calculated and exported optionally when explicitly requested, without making them mandatory for every run.
-- Added strict Step 1 environment validation for `KERNELS_PATH`, `python3` YAML-module availability, and local ICY DLM files.
-- Implemented deterministic meta-kernel resolution under `KERNELS_PATH` with default `em16_ops.tm`.
+- Added strict Step 1 environment validation for `KERNEL_PATH`, `python3` YAML-module availability, and local ICY DLM files.
+- Implemented deterministic meta-kernel resolution under `KERNEL_PATH` with default `em16_ops.tm`.
 - Added a reusable cross-repo `changelog-maintainer` skill and enforced changelog maintenance in repository rules.
 - Documented the direct arm64 IDL binary as the Codex sandbox debugging fallback when the canonical launcher fails its architecture probe.
 - Fixed meta-kernel resolution to use deterministic candidate paths instead of the broken recursive wildcard search.

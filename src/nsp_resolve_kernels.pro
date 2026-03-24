@@ -4,7 +4,7 @@ function nsp_resolve_relative_meta_kernel, kernels_path, relative_name
   candidate_path = file_expand_path(kernels_path + '/' + relative_name)
 
   if ~file_test(candidate_path, /REGULAR) then begin
-    message, 'Step 2 kernel resolution failed: specified meta-kernel was not found beneath KERNELS_PATH: ' + candidate_path, /NONAME
+    message, 'Step 2 kernel resolution failed: specified meta-kernel was not found beneath KERNEL_PATH: ' + candidate_path, /NONAME
   endif
 
   if ~file_test(candidate_path, /READ) then begin
@@ -18,10 +18,10 @@ end
 function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name
   compile_opt strictarr
 
-  kernels_path = strtrim(getenv('KERNELS_PATH'), 2)
+  kernels_path = strtrim(getenv('KERNEL_PATH'), 2)
 
   if kernels_path eq '' then begin
-    message, 'Step 2 kernel resolution failed: KERNELS_PATH is not set. Run environment validation before kernel resolution.', /NONAME
+    message, 'Step 2 kernel resolution failed: KERNEL_PATH is not set. Run environment validation before kernel resolution.', /NONAME
   endif
 
   selected_name = 'em16_ops.tm'
@@ -34,7 +34,7 @@ function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name
   endif
 
   if strmid(selected_name, 0, 1) eq '/' then begin
-    message, 'Step 2 kernel resolution failed: meta-kernel must be resolved from KERNELS_PATH, not from an absolute path: ' + selected_name, /NONAME
+    message, 'Step 2 kernel resolution failed: meta-kernel must be resolved from KERNEL_PATH, not from an absolute path: ' + selected_name, /NONAME
   endif
 
   if strpos(selected_name, '/') ge 0 then begin
@@ -48,14 +48,14 @@ function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name
   mk_found = file_test(mk_candidate, /REGULAR)
 
   if ~root_found and ~mk_found then begin
-    diagnostic = 'Step 2 kernel resolution failed: no meta-kernel named "' + selected_name + '" was found in the deterministic search locations beneath KERNELS_PATH=' + kernels_path
+    diagnostic = 'Step 2 kernel resolution failed: no meta-kernel named "' + selected_name + '" was found in the deterministic search locations beneath KERNEL_PATH=' + kernels_path
     diagnostic = diagnostic + string(10B) + '  ' + root_candidate
     diagnostic = diagnostic + string(10B) + '  ' + mk_candidate
     message, diagnostic, /NONAME
   endif
 
   if root_found and mk_found and (root_candidate ne mk_candidate) then begin
-    diagnostic = 'Step 2 kernel resolution failed: meta-kernel name "' + selected_name + '" is ambiguous beneath KERNELS_PATH. Matching files:'
+    diagnostic = 'Step 2 kernel resolution failed: meta-kernel name "' + selected_name + '" is ambiguous beneath KERNEL_PATH. Matching files:'
     diagnostic = diagnostic + string(10B) + '  ' + root_candidate
     diagnostic = diagnostic + string(10B) + '  ' + mk_candidate
     message, diagnostic, /NONAME
