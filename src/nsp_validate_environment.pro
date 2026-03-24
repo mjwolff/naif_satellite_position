@@ -1,10 +1,18 @@
-pro nsp_validate_python_yaml_environment
+pro nsp_validate_idl_yaml_environment
   compile_opt strictarr
 
-  spawn, 'python3 -c "import yaml"', result, EXIT_STATUS=exit_status
+  catch, error_status
+  if error_status ne 0 then begin
+    error_message = !ERROR_STATE.MSG
+    catch, /cancel
+    message, 'Step 1 environment validation failed: the native IDL YAML parser is not available. ' + error_message, /NONAME
+  endif
 
-  if exit_status ne 0 then begin
-    message, 'Step 1 environment validation failed: python3 with the yaml module is required. Install PyYAML for python3 before running repository validation workflows.', /NONAME
+  yaml_document = yaml_parse('cases: []')
+  catch, /cancel
+
+  if ~obj_isa(yaml_document, 'YAML_MAP') then begin
+    message, 'Step 1 environment validation failed: the native IDL YAML parser did not return a YAML mapping for a basic YAML document.', /NONAME
   endif
 end
 
@@ -59,11 +67,11 @@ pro nsp_validate_environment, icy_dlm_path=icy_dlm_path
     message, 'Step 1 environment validation failed: KERNELS_PATH is not readable: ' + kernels_path, /NONAME
   endif
 
-  nsp_validate_python_yaml_environment
+  nsp_validate_idl_yaml_environment
   nsp_validate_icy_environment, icy_dlm_path=icy_dlm_path
 
   print, 'Step 1 environment validation passed.'
   print, 'KERNELS_PATH=' + kernels_path
-  print, 'python3 yaml module=available'
+  print, 'IDL YAML parser=available'
   print, 'ICY DLM directory=' + nsp_resolve_icy_dlm_path(icy_dlm_path=icy_dlm_path)
 end

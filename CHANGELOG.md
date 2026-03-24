@@ -1,7 +1,11 @@
 # Changelog
 
 ## 2026-03-24
+- Removed the obsolete `src/nsp_emit_batch_cases.py` helper after the batch YAML path was migrated to native IDL parsing.
+- Replaced the Step 10 Python YAML batch helper with native IDL `YAML_PARSE` handling in `nsp_read_batch_cases.pro`.
+- Removed the Step 1 `python3`/PyYAML prerequisite and now validate the native IDL YAML parser instead.
 - 2026-03-24 11:59:38 CET commit: Add batch UTC range expansion support
+- 2026-03-24 11:59:56 CET commit: Record changelog timestamp for batch range support
 
 
 ## 2026-03-23

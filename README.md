@@ -27,7 +27,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - In this Codex environment, the canonical launcher may fail before user code runs because its internal architecture probe is sandbox-restricted. For local debugging in that environment, the direct arm64 IDL binary is:
   `/Applications/NV5/idl92/bin/bin.darwin.arm64/idl`
 - `KERNELS_PATH` must be defined and must point to a readable local kernel root directory.
-- `python3` must be available and able to import the `yaml` module.
+- The native IDL `YAML_PARSE` routine must be available from the installed IDL distribution.
 - The ICY DLM path is resolved in this order: IDL keyword `ICY_DLM_PATH`, environment variable `ICY_DLM_PATH`, then the default `/Users/mwolff/lib/Darwin_arm64`.
 - The resolved ICY DLM directory, descriptor, and shared library must all exist and be readable.
 - `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
@@ -45,12 +45,6 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - Optional Keplerian-element export is available in Step 9 only when explicitly requested, and those elements are derived from a separate Mars-centered `J2000` state rather than the rotating `IAU_MARS` state.
 - Step 11 validates the integrated output bundle before CSV writing, including required finiteness, solar-angle range checks, and tangent-geometry consistency.
 - The repository does not download kernels and does not fall back to guessed paths.
-
-Install the Python YAML module with:
-
-```sh
-python3 -m pip install --user --break-system-packages PyYAML
-```
 
 ## Run the current validation stage
 
@@ -261,7 +255,7 @@ Expected behavior:
 - execution stops immediately with a clear message if `tests/` is not available from the current working directory
 - execution stops immediately with a clear message if `outputs/` is not available from the current working directory
 - execution stops immediately with a clear message if `KERNELS_PATH` is missing or invalid
-- execution stops immediately with a clear message if `python3` cannot import `yaml`
+- execution stops immediately with a clear message if the native IDL `YAML_PARSE` routine is unavailable
 - execution stops immediately with a clear message if the ICY DLM directory, `icy.dlm`, or `icy.so` is missing or unreadable
 - execution stops immediately with a clear message if the requested meta-kernel is missing, unreadable, or ambiguous in the deterministic search locations beneath `KERNELS_PATH`
 - execution stops immediately with a clear message if `cspice_furnsh` cannot load the resolved meta-kernel
