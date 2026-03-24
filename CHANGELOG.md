@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-03-24
+- 2026-03-24 11:59:38 CET commit: Add batch UTC range expansion support
+
+
 ## 2026-03-23
 - Added YAML batch support for UTC ranges using `utc_start`, `utc_end`, and `dt_seconds`, with strict expansion into deterministic per-epoch cases.
 - Documented the new batch range syntax and updated sample/test batch configurations to cover valid and invalid range handling.
