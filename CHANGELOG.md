@@ -10,6 +10,7 @@
 - 2026-03-24 12:19:16 CET commit: Replace batch Python helper with IDL YAML parser
 - 2026-03-24 12:19:52 CET commit: Record changelog timestamp for IDL YAML parser
 - 2026-03-24 12:26:30 CET commit: Record changelog timestamp for IDL parser follow-up
+- 2026-03-24 12:50:17 CET commit: Document TGO occultation batch example
 
 
 ## 2026-03-23
