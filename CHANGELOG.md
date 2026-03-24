@@ -20,6 +20,7 @@
 - 2026-03-24 15:54:24 CET commit: Format and document batch runner
 - 2026-03-24 16:19:23 CET commit: Add routine docs to batch runner
 - 2026-03-24 16:46:20 CET commit: Rename KERNELS_PATH to KERNEL_PATH
+- 2026-03-24 16:52:00 CET commit: Update README batch script example
 
 
 ## 2026-03-23

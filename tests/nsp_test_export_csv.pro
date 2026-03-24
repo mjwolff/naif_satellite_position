@@ -70,12 +70,28 @@ pro nsp_test_export_csv_keplerian_success
 end
 
 
+pro nsp_test_read_output_csv_success
+  compile_opt strictarr
+
+  utc_string = '2025-01-01T00:00:00'
+  nsp_export_csv, utc_string=utc_string, case_id='step9_reader', output_filename='step9_reader.csv', output_path=output_path
+  nsp_read_output_csv, output_path, csv_data=csv_data
+
+  nsp_assert_true, n_elements(csv_data.case_id) eq 1L, 'CSV reader should return one entry for a single-row export.'
+  nsp_assert_true, csv_data.case_id[0] eq 'step9_reader', 'CSV reader case_id attribute is incorrect.'
+  nsp_assert_true, csv_data.utc[0] eq utc_string, 'CSV reader UTC attribute is incorrect.'
+  nsp_assert_true, finite(double(csv_data.et[0])), 'CSV reader ET attribute is not finite.'
+  nsp_assert_true, (csv_data.occultation_valid[0] eq '0') or (csv_data.occultation_valid[0] eq '1'), 'CSV reader occultation_valid attribute is not an explicit 0/1 flag.'
+end
+
+
 pro nsp_test_export_csv
   compile_opt strictarr
 
   nsp_test_export_csv_base_success
   nsp_test_export_csv_keplerian_success
+  nsp_test_read_output_csv_success
 
   print, 'Step 9 tests passed.'
-  print, 'Validated fixed-schema CSV export, outputs directory writing, and optional Keplerian-element export.'
+  print, 'Validated fixed-schema CSV export, CSV structure reading, outputs directory writing, and optional Keplerian-element export.'
 end

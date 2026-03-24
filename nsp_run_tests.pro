@@ -17,7 +17,7 @@ pro nsp_run_tests, icy_dlm_path=icy_dlm_path
   nsp_setup_path, /include_tests
 
   test_names = ['Step 4 Time Handling', 'Step 5 State Vectors', 'Step 6 Geometry', 'Step 7 Solar Geometry', 'Step 8 Occultation', 'Step 9 Export', 'Step 10 Batch', 'Step 11 Validation']
-  test_counts = [4L, 2L, 2L, 2L, 4L, 2L, 3L, 4L]
+  test_counts = [4L, 2L, 2L, 2L, 4L, 3L, 3L, 4L]
   pass_counts = lonarr(n_elements(test_names))
   fail_counts = lonarr(n_elements(test_names))
 
