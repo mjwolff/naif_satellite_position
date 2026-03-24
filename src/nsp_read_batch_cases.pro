@@ -81,6 +81,13 @@ pro nsp_read_batch_cases, config_path=config_path, case_ids=case_ids, utc_string
 
   for i = 0L, case_count - 1L do begin
     fields = strsplit(result_lines[i], tab_character, /extract)
+    if n_elements(fields) eq 3 then begin
+      line_length = strlen(result_lines[i])
+      if (line_length gt 0L) and (strmid(result_lines[i], line_length - 1L, 1) eq tab_character) then begin
+        fields = [fields, '']
+      endif
+    endif
+
     if n_elements(fields) ne 4 then begin
       message, 'Step 10 batch configuration failed: parser returned an invalid case definition row: ' + result_lines[i], /NONAME
     endif

@@ -2,7 +2,8 @@ cases:
   - case_id: batch_valid_a
     utc: '2025-01-01T00:00:00'
     output_filename: batch_valid_a.csv
-  - case_id: batch_valid_b
-    utc: '2025-01-01T00:10:00'
-    output_filename: batch_valid_b_kep.csv
+  - case_id: batch_valid_series
+    utc_start: '2025-01-01T00:10:00'
+    utc_end: '2025-01-01T00:30:00'
+    dt_seconds: 600
     include_keplerian_elements: true

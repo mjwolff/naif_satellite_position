@@ -207,9 +207,19 @@ cases:
     utc: '2025-01-01T00:00:00'
     output_filename: some_case_id.csv
     include_keplerian_elements: false
+  - case_id: some_case_series
+    utc_start: '2025-01-01T00:00:00'
+    utc_end: '2025-01-01T01:00:00'
+    dt_seconds: 600
+    include_keplerian_elements: true
 ```
 
-`case_id` and `utc` are required. `output_filename` is optional and defaults to `case_id + '.csv'`. `include_keplerian_elements` is optional and defaults to `false`. Batch cases are executed in the YAML list order, and one failed case is reported explicitly without preventing later cases from running.
+Each batch entry must define either:
+
+- `case_id` plus a single `utc`
+- `case_id` plus `utc_start`, `utc_end`, and positive integer `dt_seconds`
+
+For single-UTC entries, `output_filename` is optional and defaults to `case_id + '.csv'`. For UTC-range entries, `output_filename` must be omitted; the reader expands the range into one case per timestamp, with generated case identifiers and filenames of the form `case_id_YYYY_MM_DD_HHMMSS` and `case_id_YYYY_MM_DD_HHMMSS.csv`. UTC-range spans must be exact multiples of `dt_seconds`, and batch cases are executed in YAML list order after expansion. One failed case is reported explicitly without preventing later cases from running.
 
 ## Tests
 

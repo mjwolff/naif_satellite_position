@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-03-23
+- Added YAML batch support for UTC ranges using `utc_start`, `utc_end`, and `dt_seconds`, with strict expansion into deterministic per-epoch cases.
+- Documented the new batch range syntax and updated sample/test batch configurations to cover valid and invalid range handling.
 - 2026-03-23 12:33:32 CET commit b59e2a3: Use post-commit hook for changelog timestamps
 - 2026-03-23 12:34:02 CET commit feb0227: Record hook-generated changelog timestamp
 - Added root-level `nsp_setup_path.pro` so repository entrypoints share one strict `!PATH` setup routine for `src/` and optional `tests/`.
@@ -10,6 +12,7 @@
 - 2026-03-23 12:55:29 CET commit: Add per-suite test results table
 - 2026-03-23 13:03:22 CET commit: testing commit-msg script.
 - 2026-03-23 18:54:42 CET commit: Add shared IDL path setup helper
+- 2026-03-23 19:02:53 CET commit: Record changelog timestamp for path setup helper
 
 
 ## 2026-03-22

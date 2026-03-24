@@ -1,8 +1,6 @@
 cases:
-  - case_id: tgo_case_2025_01_01_000000
-    utc: '2025-01-01T00:00:00'
-    output_filename: tgo_case_2025_01_01_000000.csv
-  - case_id: tgo_case_2025_01_01_001000
-    utc: '2025-01-01T00:10:00'
-    output_filename: tgo_case_2025_01_01_001000.csv
+  - case_id: tgo_case
+    utc_start: '2025-01-01T00:00:00'
+    utc_end: '2025-01-01T00:10:00'
+    dt_seconds: 600
     include_keplerian_elements: true

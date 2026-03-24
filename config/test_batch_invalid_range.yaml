@@ -1,0 +1,5 @@
+cases:
+  - case_id: batch_invalid_range
+    utc_start: '2025-01-01T00:00:00'
+    utc_end: '2025-01-01T00:25:00'
+    dt_seconds: 600
