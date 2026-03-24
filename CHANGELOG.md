@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-03-24
+- Changed Step 10 batch execution to write one aggregate CSV per batch run, with per-case `batch_status` and `failure_message` columns and deterministic filenames derived from the batch config.
+- Refactored CSV export so batch mode can reuse shared row-building and table-writing helpers while preserving optional Keplerian columns.
+- Updated Step 10 tests and README examples to validate and document aggregate single-file batch output, including isolated invalid-UTC failures.
 - Added `config/example_tgo_occultation_3h.yaml` as a ready-to-run 3-hour, 5-second-step TGO batch example that uses the existing `occultation_valid` output flag.
 - Removed the obsolete `src/nsp_emit_batch_cases.py` helper after the batch YAML path was migrated to native IDL parsing.
 - Replaced the Step 10 Python YAML batch helper with native IDL `YAML_PARSE` handling in `nsp_read_batch_cases.pro`.
@@ -11,6 +14,7 @@
 - 2026-03-24 12:19:52 CET commit: Record changelog timestamp for IDL YAML parser
 - 2026-03-24 12:26:30 CET commit: Record changelog timestamp for IDL parser follow-up
 - 2026-03-24 12:50:17 CET commit: Document TGO occultation batch example
+- 2026-03-24 12:50:35 CET commit: Record changelog timestamp for batch example
 
 
 ## 2026-03-23

@@ -258,8 +258,10 @@ pro nsp_read_batch_cases, config_path=config_path, case_ids=case_ids, utc_string
     dt_seconds_double = double(dt_seconds)
     step_count_double = (end_et - start_et) / dt_seconds_double
     rounded_step_count = round(step_count_double)
+    reconstructed_end_et = start_et + (double(rounded_step_count) * dt_seconds_double)
 
-    if abs(step_count_double - double(rounded_step_count)) gt 1D-9 then begin
+    ; Allow a small ET tolerance so exact UTC wall-clock spans survive SPICE floating-point conversion.
+    if abs(end_et - reconstructed_end_et) gt 1D-5 then begin
       message, 'Step 10 batch configuration failed: case ' + strtrim(case_index, 2) + ' UTC range span must be an exact multiple of ''dt_seconds''.', /NONAME
     endif
 

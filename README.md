@@ -183,10 +183,10 @@ kep_rp_km,kep_eccentricity,kep_inclination_rad,kep_longitude_of_ascending_node_r
 
 ## Batch usage
 
-Step 10 batch execution reads deterministic case definitions from `config/tgo_cases.yaml` by default and writes one CSV per successful case beneath `outputs/`:
+Step 10 batch execution reads deterministic case definitions from `config/tgo_cases.yaml` by default and writes one aggregate CSV per batch run beneath `outputs/`:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
+CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
 .COMPILE 'nsp_run_batch.pro'
 NSP_RUN_BATCH
 ```
@@ -213,7 +213,7 @@ Each batch entry must define either:
 - `case_id` plus a single `utc`
 - `case_id` plus `utc_start`, `utc_end`, and positive integer `dt_seconds`
 
-For single-UTC entries, `output_filename` is optional and defaults to `case_id + '.csv'`. For UTC-range entries, `output_filename` must be omitted; the reader expands the range into one case per timestamp, with generated case identifiers and filenames of the form `case_id_YYYY_MM_DD_HHMMSS` and `case_id_YYYY_MM_DD_HHMMSS.csv`. UTC-range spans must be exact multiples of `dt_seconds`, and batch cases are executed in YAML list order after expansion. One failed case is reported explicitly without preventing later cases from running.
+For single-UTC entries, `output_filename` remains optional for schema compatibility, but batch execution now writes one aggregate CSV named from the batch config file. For UTC-range entries, `output_filename` must be omitted; the reader expands the range into one case per timestamp with generated case identifiers of the form `case_id_YYYY_MM_DD_HHMMSS`. UTC-range spans must be exact multiples of `dt_seconds`, and batch cases are executed in YAML list order after expansion. The aggregate CSV preserves one row per expanded case, adds `batch_status` and `failure_message` columns, and keeps failed cases isolated without preventing later cases from running.
 
 Example batch configuration: to compute TGO positions for 3 hours starting at `2025-01-01T00:00:00` with `dt_seconds: 5`, use [`config/example_tgo_occultation_3h.yaml`](/Users/mwolff/processing_local/chatgpt/naif_satellite_position/config/example_tgo_occultation_3h.yaml):
 
@@ -233,7 +233,7 @@ CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
 NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_occultation_3h.yaml'
 ```
 
-This expands to 2161 batch cases and writes one CSV per epoch beneath `outputs/`. Each CSV row includes the `occultation_valid` column, which is the explicit occultation flag for that spacecraft position.
+This expands to 2161 batch cases and writes one aggregate CSV at `outputs/example_tgo_occultation_3h.csv`. Each row includes the `occultation_valid` column, which is the explicit occultation flag for that spacecraft position, along with `batch_status` and `failure_message` columns for per-case diagnostics.
 
 
 ## Tests
@@ -243,7 +243,7 @@ Step-specific test routines now live under the repository root `tests/` director
 A focused test run is available through the test entrypoint:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
+CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
 .COMPILE 'nsp_run_tests.pro'
 NSP_RUN_TESTS
 ```
