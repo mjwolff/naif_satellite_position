@@ -36,12 +36,15 @@ function nsp_batch_safe_failure_message, raw_message
   endif else begin
     safe_message = strtrim(raw_message, 2)
   endelse
+
   if safe_message eq '' then return, 'unknown_failure'
 
   linefeed = string(10B, format='(A1)')
   carriage_return = string(13B, format='(A1)')
+
   linefeed_index = strpos(safe_message, linefeed)
   if linefeed_index ge 0 then safe_message = strmid(safe_message, 0, linefeed_index)
+
   carriage_return_index = strpos(safe_message, carriage_return)
   if carriage_return_index ge 0 then safe_message = strmid(safe_message, 0, carriage_return_index)
 
@@ -49,6 +52,7 @@ function nsp_batch_safe_failure_message, raw_message
   for i = 0L, n_elements(char_values) - 1L do begin
     if char_values[i] eq ',' then char_values[i] = ';'
   endfor
+
   safe_message = strjoin(char_values, '')
   safe_message = strtrim(safe_message, 2)
 
@@ -63,12 +67,15 @@ pro nsp_batch_failure_row_values, case_id, utc_string, include_keplerian_columns
 
   case_identifier = strtrim(case_id, 2)
   utc_value = strtrim(utc_string, 2)
+
+  ; Preserve the explicit UTC failure wording when we already know it is safe.
   safe_failure_message = strtrim(failure_message, 2)
   if strpos(safe_failure_message, 'UTC to ET') lt 0 then begin
     safe_failure_message = nsp_batch_safe_failure_message(failure_message)
   endif
-  base_nan_values = nsp_export_nan_values(n_elements(nsp_export_base_header()) - 2L)
 
+  ; Failure rows keep the same schema as success rows by filling science fields with NaN.
+  base_nan_values = nsp_export_nan_values(n_elements(nsp_export_base_header()) - 2L)
   row_values = [case_identifier, utc_value, base_nan_values]
 
   if include_keplerian_columns then begin
@@ -79,7 +86,16 @@ pro nsp_batch_failure_row_values, case_id, utc_string, include_keplerian_columns
 end
 
 
-pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path, global_include_keplerian_elements=global_include_keplerian_elements, success_count=success_count, failure_count=failure_count, succeeded_case_ids=succeeded_case_ids, failed_case_ids=failed_case_ids, output_paths=output_paths
+pro nsp_run_batch, $
+  config_path=config_path, $
+  meta_kernel_name=meta_kernel_name, $
+  icy_dlm_path=icy_dlm_path, $
+  global_include_keplerian_elements=global_include_keplerian_elements, $
+  success_count=success_count, $
+  failure_count=failure_count, $
+  succeeded_case_ids=succeeded_case_ids, $
+  failed_case_ids=failed_case_ids, $
+  output_paths=output_paths
   compile_opt strictarr
 
   nsp_setup_path
@@ -87,7 +103,12 @@ pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, i
   nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path
   resolve_routine, 'nsp_read_batch_cases', /COMPILE_FULL_FILE
   resolve_routine, 'nsp_export_csv', /COMPILE_FULL_FILE
-  nsp_read_batch_cases, config_path=config_path, case_ids=case_ids, utc_strings=utc_strings, include_keplerian_values=include_keplerian_values, output_filenames=output_filenames
+  nsp_read_batch_cases, $
+    config_path=config_path, $
+    case_ids=case_ids, $
+    utc_strings=utc_strings, $
+    include_keplerian_values=include_keplerian_values, $
+    output_filenames=output_filenames
 
   resolved_config_path = 'config/tgo_cases.yaml'
   if n_elements(config_path) gt 0 then begin
@@ -97,6 +118,7 @@ pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, i
 
   batch_output_filename = nsp_batch_output_filename_from_config_path(resolved_config_path)
   case_count = n_elements(case_ids)
+
   success_count = 0L
   failure_count = 0L
   succeeded_case_ids = strarr(case_count)
@@ -109,7 +131,10 @@ pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, i
     include_any_keplerian = total(long(include_keplerian_values gt 0L)) gt 0L
   endif
 
-  header_values = nsp_export_header_values(include_keplerian_columns=include_any_keplerian, include_batch_status=1B)
+  ; The aggregate file has one fixed schema for the whole batch run.
+  header_values = nsp_export_header_values($
+    include_keplerian_columns=include_any_keplerian, $
+    include_batch_status=1B)
 
   for i = 0L, case_count - 1L do begin
     case_identifier = case_ids[i]
@@ -119,12 +144,15 @@ pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, i
     print, 'Step 10 batch case start: case_id=' + case_identifier
     print, 'Step 10 batch case UTC=' + utc_value
 
+    ; Validate UTC early so invalid timestamps produce a deterministic failure row.
     catch, error_status
     if error_status ne 0 then begin
       catch, /cancel
       error_message = 'Step 4 time handling failed: unable to convert UTC to ET for ' + utc_value
       failed_case_ids[failure_count] = case_identifier
-      nsp_batch_failure_row_values, case_identifier, utc_value, include_any_keplerian, error_message, row_values=row_values
+      nsp_batch_failure_row_values, $
+        case_identifier, utc_value, include_any_keplerian, error_message, $
+        row_values=row_values
       row_strings[i] = nsp_export_join_row(row_values)
       failure_count = failure_count + 1L
       print, 'Step 10 batch case failed: case_id=' + case_identifier
@@ -139,7 +167,9 @@ pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, i
       error_message = !ERROR_STATE.MSG
       catch, /cancel
       failed_case_ids[failure_count] = case_identifier
-      nsp_batch_failure_row_values, case_identifier, utc_value, include_any_keplerian, error_message, row_values=row_values
+      nsp_batch_failure_row_values, $
+        case_identifier, utc_value, include_any_keplerian, error_message, $
+        row_values=row_values
       row_strings[i] = nsp_export_join_row(row_values)
       failure_count = failure_count + 1L
       print, 'Step 10 batch case failed: case_id=' + case_identifier
@@ -147,17 +177,26 @@ pro nsp_run_batch, config_path=config_path, meta_kernel_name=meta_kernel_name, i
       continue
     endif
 
-    nsp_build_export_row, utc_string=utc_value, case_id=case_identifier, include_keplerian_elements=include_keplerian_for_case, force_keplerian_columns=include_any_keplerian, row_values=row_values
+    nsp_build_export_row, $
+      utc_string=utc_value, $
+      case_id=case_identifier, $
+      include_keplerian_elements=include_keplerian_for_case, $
+      force_keplerian_columns=include_any_keplerian, $
+      row_values=row_values
     catch, /cancel
 
     row_values = [row_values, 'success', 'none']
     row_strings[i] = nsp_export_join_row(row_values)
     succeeded_case_ids[success_count] = case_identifier
     success_count = success_count + 1L
+
     print, 'Step 10 batch case passed: case_id=' + case_identifier
   endfor
 
-  nsp_write_csv_file, header_values, row_strings, default_filename=batch_output_filename, output_path=batch_output_path
+  nsp_write_csv_file, $
+    header_values, row_strings, $
+    default_filename=batch_output_filename, $
+    output_path=batch_output_path
   output_paths[0] = batch_output_path
 
   if success_count gt 0L then begin
