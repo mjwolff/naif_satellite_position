@@ -17,6 +17,7 @@
 - 2026-03-24 12:50:35 CET commit: Record changelog timestamp for batch example
 - 2026-03-24 15:35:12 CET commit: Write batch results to a single CSV
 - 2026-03-24 15:36:17 CET commit: Record changelog timestamp for batch CSV output
+- 2026-03-24 15:54:24 CET commit: Format and document batch runner
 
 
 ## 2026-03-23
