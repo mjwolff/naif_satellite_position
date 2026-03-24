@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-03-24
+- Added `config/example_tgo_occultation_3h.yaml` as a ready-to-run 3-hour, 5-second-step TGO batch example that uses the existing `occultation_valid` output flag.
 - Removed the obsolete `src/nsp_emit_batch_cases.py` helper after the batch YAML path was migrated to native IDL parsing.
 - Replaced the Step 10 Python YAML batch helper with native IDL `YAML_PARSE` handling in `nsp_read_batch_cases.pro`.
 - Removed the Step 1 `python3`/PyYAML prerequisite and now validate the native IDL YAML parser instead.
@@ -8,6 +9,7 @@
 - 2026-03-24 11:59:56 CET commit: Record changelog timestamp for batch range support
 - 2026-03-24 12:19:16 CET commit: Replace batch Python helper with IDL YAML parser
 - 2026-03-24 12:19:52 CET commit: Record changelog timestamp for IDL YAML parser
+- 2026-03-24 12:26:30 CET commit: Record changelog timestamp for IDL parser follow-up
 
 
 ## 2026-03-23

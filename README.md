@@ -215,6 +215,27 @@ Each batch entry must define either:
 
 For single-UTC entries, `output_filename` is optional and defaults to `case_id + '.csv'`. For UTC-range entries, `output_filename` must be omitted; the reader expands the range into one case per timestamp, with generated case identifiers and filenames of the form `case_id_YYYY_MM_DD_HHMMSS` and `case_id_YYYY_MM_DD_HHMMSS.csv`. UTC-range spans must be exact multiples of `dt_seconds`, and batch cases are executed in YAML list order after expansion. One failed case is reported explicitly without preventing later cases from running.
 
+Example batch configuration: to compute TGO positions for 3 hours starting at `2025-01-01T00:00:00` with `dt_seconds: 5`, use [`config/example_tgo_occultation_3h.yaml`](/Users/mwolff/processing_local/chatgpt/naif_satellite_position/config/example_tgo_occultation_3h.yaml):
+
+```yaml
+cases:
+  - case_id: tgo_occultation_3h
+    utc_start: '2025-01-01T00:00:00'
+    utc_end: '2025-01-01T03:00:00'
+    dt_seconds: 5
+```
+
+Run it with:
+
+```idl
+CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
+.COMPILE 'nsp_run_batch.pro'
+NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_occultation_3h.yaml'
+```
+
+This expands to 2161 batch cases and writes one CSV per epoch beneath `outputs/`. Each CSV row includes the `occultation_valid` column, which is the explicit occultation flag for that spacecraft position.
+
+
 ## Tests
 
 Step-specific test routines now live under the repository root `tests/` directory.
