@@ -7,6 +7,7 @@
 - 2026-03-24 11:59:38 CET commit: Add batch UTC range expansion support
 - 2026-03-24 11:59:56 CET commit: Record changelog timestamp for batch range support
 - 2026-03-24 12:19:16 CET commit: Replace batch Python helper with IDL YAML parser
+- 2026-03-24 12:19:52 CET commit: Record changelog timestamp for IDL YAML parser
 
 
 ## 2026-03-23
