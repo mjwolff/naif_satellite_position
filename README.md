@@ -227,10 +227,18 @@ cases:
 
 Run it with:
 
-```idl
+```sh
+#!/bin/zsh
+set -euo pipefail
+
+export KERNEL_PATH=/Volumes/Wolff_misc1/nomad_naif/tgo_kernels/
+
+/Applications/NV5/idl92/bin/bin.darwin.arm64/idl <<'IDL'
 CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
 .COMPILE 'nsp_run_batch.pro'
 NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_occultation_3h.yaml'
+EXIT
+IDL
 ```
 
 This expands to 2161 batch cases and writes one aggregate CSV at `outputs/example_tgo_occultation_3h.csv`. Each row includes the `occultation_valid` column, which is the explicit occultation flag for that spacecraft position, along with `batch_status` and `failure_message` columns for per-case diagnostics.
