@@ -62,14 +62,9 @@ function nsp_batch_safe_failure_message, raw_message
   linefeed = string(10B, format='(A1)')
   carriage_return = string(13B, format='(A1)')
 
-  linefeed_index = strpos(safe_message, linefeed)
-  if linefeed_index ge 0 then safe_message = strmid(safe_message, 0, linefeed_index)
-
-  carriage_return_index = strpos(safe_message, carriage_return)
-  if carriage_return_index ge 0 then safe_message = strmid(safe_message, 0, carriage_return_index)
-
   char_values = strmid(safe_message, lindgen(strlen(safe_message)), 1)
   for i = 0L, n_elements(char_values) - 1L do begin
+    if (char_values[i] eq linefeed) or (char_values[i] eq carriage_return) then char_values[i] = ' '
     if char_values[i] eq ',' then char_values[i] = ';'
   endfor
 

@@ -31,21 +31,24 @@ pro nsp_compute_geometry_from_position, position_vector, longitude=longitude, la
     message, 'Step 6 geometry conversion failed: cspice_reclat returned non-finite geometry values.', /NONAME
   endif
 
-  tolerance = 1D-10
+  angular_tolerance = 1D-10
+  radius_absolute_tolerance = 1D-6
+  radius_relative_tolerance = 1D-14
   radius_difference = abs(radius - spice_radius)
+  allowed_radius_difference = radius_absolute_tolerance > (radius_relative_tolerance * abs(spice_radius))
   longitude_difference = abs(longitude - spice_longitude)
   if longitude_difference gt !dpi then longitude_difference = abs(longitude_difference - (2D * !dpi))
   latitude_difference = abs(latitude - spice_latitude)
 
-  if radius_difference gt tolerance then begin
+  if radius_difference gt allowed_radius_difference then begin
     message, 'Step 6 geometry conversion failed: manual radius does not agree with cspice_reclat.', /NONAME
   endif
 
-  if longitude_difference gt tolerance then begin
+  if longitude_difference gt angular_tolerance then begin
     message, 'Step 6 geometry conversion failed: manual longitude does not agree with cspice_reclat.', /NONAME
   endif
 
-  if latitude_difference gt tolerance then begin
+  if latitude_difference gt angular_tolerance then begin
     message, 'Step 6 geometry conversion failed: manual latitude does not agree with cspice_reclat.', /NONAME
   endif
 

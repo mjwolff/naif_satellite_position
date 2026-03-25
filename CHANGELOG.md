@@ -7,6 +7,7 @@
 - 2026-03-25 17:19:50 CET commit: Return survey structure from occultation extractor
 - 2026-03-25 17:20:12 CET commit: Record changelog timestamp for survey extractor
 - 2026-03-25 17:21:08 CET commit: Record changelog timestamp after survey push
+- 2026-03-25 18:00:18 CET commit: Add debug kernel-path fallback plumbing
 
 ## 2026-03-24
 - Changed Step 10 batch execution to write one aggregate CSV per batch run, with per-case `batch_status` and `failure_message` columns and deterministic filenames derived from the batch config.
