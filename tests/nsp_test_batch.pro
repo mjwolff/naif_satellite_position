@@ -20,6 +20,17 @@ pro nsp_read_text_file_lines, file_path, lines=lines
 end
 
 
+pro nsp_write_text_file_lines, file_path, lines
+  compile_opt strictarr
+
+  openw, lun, file_path, /get_lun
+  for i = 0L, n_elements(lines) - 1L do begin
+    printf, lun, lines[i]
+  endfor
+  free_lun, lun
+end
+
+
 pro nsp_test_batch_valid_config
   compile_opt strictarr
 
@@ -127,13 +138,50 @@ pro nsp_test_batch_invalid_range_config
 end
 
 
+pro nsp_test_batch_occultation_event_extraction
+  compile_opt strictarr
+
+  synthetic_output_path = file_expand_path('outputs/test_batch_occultation_events.csv')
+  if file_test(synthetic_output_path, /REGULAR) then file_delete, synthetic_output_path
+
+  lines = [ $
+    'case_id,utc,occultation_valid,tangent_altitude_km,batch_status,failure_message', $
+    'profile_000000,2025-01-01T00:00:00,1,160,success,none', $
+    'profile_000500,2025-01-01T00:05:00,1,140,success,none', $
+    'profile_001000,2025-01-01T00:10:00,1,90,success,none', $
+    'profile_001500,2025-01-01T00:15:00,1,20,success,none', $
+    'profile_002000,2025-01-01T00:20:00,1,-5,success,none', $
+    'profile_002500,2025-01-01T00:25:00,1,5,success,none', $
+    'profile_003000,2025-01-01T00:30:00,1,60,success,none', $
+    'profile_003500,2025-01-01T00:35:00,1,140,success,none', $
+    'profile_004000,2025-01-01T00:40:00,1,170,success,none']
+  nsp_write_text_file_lines, synthetic_output_path, lines
+
+  nsp_extract_occultation_events, synthetic_output_path, events=events, event_count=event_count
+
+  nsp_assert_true, event_count eq 2L, 'Step 10 occultation-event test expected two extracted events.'
+  nsp_assert_true, n_elements(events.event_id) eq 2L, 'Step 10 occultation-event test expected two event identifiers.'
+  nsp_assert_true, events.event_type[0] eq 'ingress', 'Step 10 occultation-event test expected the first event to be classified as ingress.'
+  nsp_assert_true, events.event_type[1] eq 'egress', 'Step 10 occultation-event test expected the second event to be classified as egress.'
+  nsp_assert_true, events.start_case_id[0] eq 'profile_000500', 'Step 10 occultation-event test found the wrong ingress start case.'
+  nsp_assert_true, events.end_case_id[0] eq 'profile_001500', 'Step 10 occultation-event test found the wrong ingress end case.'
+  nsp_assert_true, events.start_case_id[1] eq 'profile_002500', 'Step 10 occultation-event test found the wrong egress start case.'
+  nsp_assert_true, events.end_case_id[1] eq 'profile_003500', 'Step 10 occultation-event test found the wrong egress end case.'
+  nsp_assert_true, events.sample_count[0] eq 3L, 'Step 10 occultation-event test expected three samples in the ingress event.'
+  nsp_assert_true, events.sample_count[1] eq 3L, 'Step 10 occultation-event test expected three samples in the egress event.'
+  nsp_assert_true, abs(events.minimum_tangent_altitude_km[0] - 20D) lt 1D-10, 'Step 10 occultation-event test found the wrong ingress minimum tangent altitude.'
+  nsp_assert_true, abs(events.maximum_tangent_altitude_km[1] - 140D) lt 1D-10, 'Step 10 occultation-event test found the wrong egress maximum tangent altitude.'
+end
+
+
 pro nsp_test_batch
   compile_opt strictarr
 
   nsp_test_batch_valid_config
   nsp_test_batch_failure_isolation
   nsp_test_batch_invalid_range_config
+  nsp_test_batch_occultation_event_extraction
 
   print, 'Step 10 tests passed.'
-  print, 'Validated deterministic YAML batch execution, UTC range expansion, aggregate single-file output, and isolated case failures.'
+  print, 'Validated deterministic YAML batch execution, UTC range expansion, aggregate single-file output, isolated case failures, and occultation-event extraction.'
 end

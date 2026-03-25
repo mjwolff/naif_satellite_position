@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-03-25
+- Added `nsp_extract_occultation_events.pro` to identify contiguous atmospheric occultation events from aggregate batch CSV output and label each event as ingress or egress from the tangent-altitude trend.
+- Added Step 10 tests and README usage notes for batch-CSV occultation-event extraction with the project default `altitude_max = 150 km`.
+
 ## 2026-03-24
 - Changed Step 10 batch execution to write one aggregate CSV per batch run, with per-case `batch_status` and `failure_message` columns and deterministic filenames derived from the batch config.
 - Refactored CSV export so batch mode can reuse shared row-building and table-writing helpers while preserving optional Keplerian columns.
@@ -21,6 +25,7 @@
 - 2026-03-24 16:19:23 CET commit: Add routine docs to batch runner
 - 2026-03-24 16:46:20 CET commit: Rename KERNELS_PATH to KERNEL_PATH
 - 2026-03-24 16:52:00 CET commit: Update README batch script example
+- 2026-03-24 18:49:39 CET commit: Add CSV output reader
 
 
 ## 2026-03-23

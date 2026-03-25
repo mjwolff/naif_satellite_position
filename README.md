@@ -41,7 +41,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - Step 5 state retrieval uses frame `IAU_MARS`, observer `MARS`, target `TGO`, and aberration correction `NONE`.
 - Step 6 geometry uses a documented Mars mean radius of `3389.5 km` for spherical altitude.
 - Step 7 solar geometry uses frame `IAU_MARS`, observer `MARS`, target `SUN`, aberration correction `NONE`, and reports a spacecraft-local solar zenith angle defined between the outward radial vector and the spacecraft-to-Sun direction.
-- Step 8 occultation geometry treats the initial tangent point as the minimum-radius point on the spacecraft-to-Sun line and flags non-occultation cases explicitly instead of returning misleading tangent geometry.
+- Step 8 occultation geometry treats the initial tangent point as the minimum-radius point on the spacecraft-to-Sun line, flags non-occultation cases explicitly, and uses a working occultation-event definition based on tangent altitude crossing the atmospheric range from `0 km` to `altitude_max` (default `150 km`).
 - Optional Keplerian-element export is available in Step 9 only when explicitly requested, and those elements are derived from a separate Mars-centered `J2000` state rather than the rotating `IAU_MARS` state.
 - Step 11 validates the integrated output bundle before CSV writing, including required finiteness, solar-angle range checks, and tangent-geometry consistency.
 - The repository does not download kernels and does not fall back to guessed paths.
@@ -154,6 +154,8 @@ NSP_OCCULTATION, ET=et_value, TANGENT_POINT_VECTOR=tangent_point_vector, TANGENT
 
 If `OCCULTATION_VALID` is `0`, the code explicitly flags a non-occultation case and leaves the tangent-point geometry values non-finite instead of presenting them as valid outputs.
 
+For this project, an occultation event is defined operationally from a time-ordered tangent-altitude profile. A profile is considered part of an atmospheric occultation only while the tangent altitude is within `0 km <= tangent_altitude <= altitude_max`, with `altitude_max` defaulting to `150 km`. An ingress occultation is one in which tangent altitude decreases with time, so the event begins when the profile crosses into that range from above, usually at `150 km`, and ends when it reaches `0 km`. An egress occultation is one in which tangent altitude increases with time, so the event begins when the profile crosses into that range from below, usually at `0 km`, and ends when it reaches `150 km`. In practice, event extraction should require `OCCULTATION_VALID = 1` together with finite tangent altitude before applying this ingress or egress classification.
+
 ## Export usage
 
 After kernels are loaded, Step 9 export can write one CSV file per run beneath `outputs/`:
@@ -242,6 +244,17 @@ IDL
 ```
 
 This expands to 2161 batch cases and writes one aggregate CSV at `outputs/example_tgo_occultation_3h.csv`. Each row includes the `occultation_valid` column, which is the explicit occultation flag for that spacecraft position, along with `batch_status` and `failure_message` columns for per-case diagnostics.
+
+To extract occultation events from that aggregate batch CSV, call:
+
+```idl
+NSP_EXTRACT_OCCULTATION_EVENTS, 'outputs/example_tgo_occultation_3h.csv', EVENTS=events, EVENT_COUNT=event_count
+PRINT, events.event_type
+PRINT, events.start_utc
+PRINT, events.end_utc
+```
+
+The extractor groups contiguous successful rows where `OCCULTATION_VALID = 1` and `0 km <= tangent_altitude_km <= altitude_max_km`, with `altitude_max_km` defaulting to `150 km`. Each extracted event is labeled as `ingress` when tangent altitude decreases across the event and `egress` when it increases.
 
 
 ## Tests
