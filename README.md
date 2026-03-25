@@ -248,13 +248,15 @@ This expands to 2161 batch cases and writes one aggregate CSV at `outputs/exampl
 To extract occultation events from that aggregate batch CSV, call:
 
 ```idl
-NSP_EXTRACT_OCCULTATION_EVENTS, 'outputs/example_tgo_occultation_3h.csv', EVENTS=events, EVENT_COUNT=event_count
-PRINT, events.event_type
-PRINT, events.start_utc
-PRINT, events.end_utc
+NSP_EXTRACT_OCCULTATION_EVENTS, 'outputs/example_tgo_occultation_3h.csv', SURVEY=survey, EVENT_COUNT=event_count
+PRINT, survey.n_ingress
+PRINT, survey.n_egress
+PRINT, survey.events.type
+PRINT, survey.events.i_start
+PRINT, survey.events.i_end
 ```
 
-The extractor groups contiguous successful rows where `OCCULTATION_VALID = 1` and `0 km <= tangent_altitude_km <= altitude_max_km`, with `altitude_max_km` defaulting to `150 km`. Each extracted event is labeled as `ingress` when tangent altitude decreases across the event and `egress` when it increases.
+The returned `survey` structure contains per-step arrays mapped from the batch CSV: `time`, `tang_alt`, `tang_lat`, `tang_lon`, `n_int`, `sat_lat`, `sat_lon`, `sat_alt`, `ss_lat`, and `ss_lon`. It also reports `n_ingress`, `n_egress`, and `events`, where `events` is a structure array sorted by `t_start` or scalar `-1` when no events are found. Each event struct contains `type`, `ingress`, `i_start`, `i_end`, `t_start_interp`, `t_end_interp`, `t_start`, `t_end`, `duration_interp`, `tang_alt_min`, `lat_min`, `lon_min`, `tang_alt_max`, `lat_max`, and `lon_max`. Times are taken from the batch CSV `et` column in seconds, while latitude and longitude values are reported in degrees. The extractor groups contiguous successful rows where `OCCULTATION_VALID = 1` and `0 km <= tangent_altitude_km <= altitude_max_km`, with `altitude_max_km` defaulting to `150 km`. `survey.n_int` is the current 0/1 atmospheric-intersection mapping from that same window, `survey.ss_lat` is the first finite sub-solar latitude sample, and `type='ING'` means tangent altitude decreases from `altitude_max_km` toward `0 km` while `type='EGR'` means it increases from `0 km` toward `altitude_max_km`.
 
 
 ## Tests

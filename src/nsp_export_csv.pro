@@ -1,7 +1,7 @@
 function nsp_export_base_header
   compile_opt strictarr
 
-  return, ['case_id', 'utc', 'et', 'sc_x_km', 'sc_y_km', 'sc_z_km', 'sc_vx_km_s', 'sc_vy_km_s', 'sc_vz_km_s', 'sc_longitude_rad', 'sc_latitude_rad', 'sc_radius_km', 'sc_altitude_km', 'solar_zenith_angle_rad', 'occultation_valid', 'tangent_x_km', 'tangent_y_km', 'tangent_z_km', 'tangent_longitude_rad', 'tangent_latitude_rad', 'tangent_radius_km', 'tangent_altitude_km']
+  return, ['case_id', 'utc', 'et', 'sc_x_km', 'sc_y_km', 'sc_z_km', 'sc_vx_km_s', 'sc_vy_km_s', 'sc_vz_km_s', 'sc_longitude_rad', 'sc_latitude_rad', 'sc_radius_km', 'sc_altitude_km', 'solar_zenith_angle_rad', 'subsolar_latitude_rad', 'subsolar_longitude_rad', 'occultation_valid', 'tangent_x_km', 'tangent_y_km', 'tangent_z_km', 'tangent_longitude_rad', 'tangent_latitude_rad', 'tangent_radius_km', 'tangent_altitude_km']
 end
 
 
@@ -130,10 +130,11 @@ pro nsp_build_export_row, utc_string=utc_string, case_id=case_id, include_kepler
   nsp_compute_geometry_from_state, state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, position_vector=position_vector
   nsp_get_sun_state, et_value, sun_state_vector=sun_state_vector, light_time=sun_light_time
   nsp_compute_solar_geometry, state_vector, sun_state_vector, spacecraft_to_sun_vector=spacecraft_to_sun_vector, solar_zenith_angle=solar_zenith_angle
+  nsp_compute_geometry_from_position, sun_state_vector[0:2], longitude=subsolar_longitude, latitude=subsolar_latitude, radius=subsolar_radius, altitude=subsolar_altitude
   nsp_compute_occultation_geometry, state_vector, spacecraft_to_sun_vector, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude, occultation_valid=occultation_valid, closest_approach_distance=closest_approach_distance
   nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
 
-  row_values = [case_identifier, utc_value, nsp_csv_value_string(et_value), nsp_csv_value_string(state_vector[0]), nsp_csv_value_string(state_vector[1]), nsp_csv_value_string(state_vector[2]), nsp_csv_value_string(state_vector[3]), nsp_csv_value_string(state_vector[4]), nsp_csv_value_string(state_vector[5]), nsp_csv_value_string(longitude), nsp_csv_value_string(latitude), nsp_csv_value_string(radius), nsp_csv_value_string(altitude), nsp_csv_value_string(solar_zenith_angle), strtrim(fix(occultation_valid), 2), nsp_csv_value_string(tangent_point_vector[0]), nsp_csv_value_string(tangent_point_vector[1]), nsp_csv_value_string(tangent_point_vector[2]), nsp_csv_value_string(tangent_longitude), nsp_csv_value_string(tangent_latitude), nsp_csv_value_string(tangent_radius), nsp_csv_value_string(tangent_altitude)]
+  row_values = [case_identifier, utc_value, nsp_csv_value_string(et_value), nsp_csv_value_string(state_vector[0]), nsp_csv_value_string(state_vector[1]), nsp_csv_value_string(state_vector[2]), nsp_csv_value_string(state_vector[3]), nsp_csv_value_string(state_vector[4]), nsp_csv_value_string(state_vector[5]), nsp_csv_value_string(longitude), nsp_csv_value_string(latitude), nsp_csv_value_string(radius), nsp_csv_value_string(altitude), nsp_csv_value_string(solar_zenith_angle), nsp_csv_value_string(subsolar_latitude), nsp_csv_value_string(subsolar_longitude), strtrim(fix(occultation_valid), 2), nsp_csv_value_string(tangent_point_vector[0]), nsp_csv_value_string(tangent_point_vector[1]), nsp_csv_value_string(tangent_point_vector[2]), nsp_csv_value_string(tangent_longitude), nsp_csv_value_string(tangent_latitude), nsp_csv_value_string(tangent_radius), nsp_csv_value_string(tangent_altitude)]
 
   if keyword_set(include_keplerian_elements) then begin
     ; Keplerian elements are derived from a separate inertial J2000 state, not from the rotating IAU_MARS state.
