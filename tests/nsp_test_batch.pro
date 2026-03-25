@@ -178,7 +178,7 @@ pro nsp_test_batch_occultation_event_extraction
   ss_lon_8 = strtrim(string(208D * deg_to_rad, format='(E24.16)'), 2)
   lines = [ $
     'case_id,utc,et,sc_latitude_rad,sc_longitude_rad,sc_altitude_km,subsolar_latitude_rad,subsolar_longitude_rad,occultation_valid,tangent_latitude_rad,tangent_longitude_rad,tangent_altitude_km,batch_status,failure_message', $
-    'profile_000000,2025-01-01T00:00:00,0,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_0 + ',1,' + lat10 + ',' + lon100 + ',160,success,none', $
+    'profile_000000,2025-01-01T00:00:00,0,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_0 + ',0,' + lat10 + ',' + lon100 + ',160,success,none', $
     'profile_000500,2025-01-01T00:05:00,10,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_1 + ',1,' + lat11 + ',' + lon101 + ',140,success,none', $
     'profile_001000,2025-01-01T00:10:00,20,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_2 + ',1,' + lat12 + ',' + lon102 + ',90,success,none', $
     'profile_001500,2025-01-01T00:15:00,30,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_3 + ',1,' + lat13 + ',' + lon103 + ',20,success,none', $
@@ -186,7 +186,7 @@ pro nsp_test_batch_occultation_event_extraction
     'profile_002500,2025-01-01T00:25:00,50,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_5 + ',1,' + lat21 + ',' + lon111 + ',5,success,none', $
     'profile_003000,2025-01-01T00:30:00,60,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_6 + ',1,' + lat22 + ',' + lon112 + ',60,success,none', $
     'profile_003500,2025-01-01T00:35:00,70,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_7 + ',1,' + lat23 + ',' + lon113 + ',140,success,none', $
-    'profile_004000,2025-01-01T00:40:00,80,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_8 + ',1,' + lat24 + ',' + lon114 + ',170,success,none']
+    'profile_004000,2025-01-01T00:40:00,80,' + sat_lat + ',' + sat_lon + ',' + sat_alt + ',' + ss_lat + ',' + ss_lon_8 + ',0,' + lat24 + ',' + lon114 + ',170,success,none']
   nsp_write_text_file_lines, synthetic_output_path, lines
 
   nsp_extract_occultation_events, synthetic_output_path, survey=survey, event_count=event_count
@@ -200,6 +200,8 @@ pro nsp_test_batch_occultation_event_extraction
   nsp_assert_true, n_elements(survey.sat_lon) eq 9L, 'Step 10 occultation-event test expected survey.sat_lon to include all input rows.'
   nsp_assert_true, n_elements(survey.sat_alt) eq 9L, 'Step 10 occultation-event test expected survey.sat_alt to include all input rows.'
   nsp_assert_true, n_elements(survey.ss_lon) eq 9L, 'Step 10 occultation-event test expected survey.ss_lon to include all input rows.'
+  nsp_assert_true, abs(survey.tang_alt[0] - 160D) lt 1D-10, 'Step 10 occultation-event test should preserve rows with occultation_valid=0 in survey.tang_alt.'
+  nsp_assert_true, abs(survey.tang_alt[8] - 170D) lt 1D-10, 'Step 10 occultation-event test should preserve the final occultation_valid=0 row in survey.tang_alt.'
   nsp_assert_true, event_count eq 2L, 'Step 10 occultation-event test expected two extracted events.'
   nsp_assert_true, survey.n_ingress eq 1L, 'Step 10 occultation-event test expected one ingress event.'
   nsp_assert_true, survey.n_egress eq 1L, 'Step 10 occultation-event test expected one egress event.'

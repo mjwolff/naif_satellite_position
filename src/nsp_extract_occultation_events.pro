@@ -143,11 +143,14 @@ end
 ;   nsp_extract_occultation_events, csv_path, survey=survey, [altitude_max_km=altitude_max_km], [event_count=event_count]
 ;
 ; Notes:
-;   survey.n_int is mapped as a per-step 0/1 atmospheric-intersection flag from the
-;   current CSV output: 1 when the row is successful, occultation_valid=1, and the
-;   tangent altitude lies inside [0, altitude_max_km]. survey.ss_lat is returned as
-;   the first finite sub-solar latitude sample from the CSV, which is the operational
-;   scalar used for the current fixed-LsubS workflow.
+;   survey preserves one element per input CSV row, including rows where
+;   occultation_valid=0 or batch_status is not 'success'. Those flags only affect the
+;   event-detection mask, not the per-step survey arrays. survey.n_int is mapped as a
+;   per-step 0/1 atmospheric-intersection flag from the current CSV output: 1 when the
+;   row is successful, occultation_valid=1, and the tangent altitude lies inside
+;   [0, altitude_max_km]. survey.ss_lat is returned as the first finite sub-solar
+;   latitude sample from the CSV, which is the operational scalar used for the current
+;   fixed-LsubS workflow.
 pro nsp_extract_occultation_events, csv_path, survey=survey, altitude_max_km=altitude_max_km, event_count=event_count
   compile_opt strictarr
 

@@ -123,7 +123,8 @@ end
 ;
 ; Calling sequence:
 ;   nsp_run_batch, [config_path=config_path], [meta_kernel_name=meta_kernel_name], $
-;     [icy_dlm_path=icy_dlm_path], [global_include_keplerian_elements=global_include_keplerian_elements], $
+;     [icy_dlm_path=icy_dlm_path], [debug=debug], $
+;     [global_include_keplerian_elements=global_include_keplerian_elements], $
 ;     [success_count=success_count], [failure_count=failure_count], $
 ;     [succeeded_case_ids=succeeded_case_ids], [failed_case_ids=failed_case_ids], [output_paths=output_paths]
 ;
@@ -131,6 +132,8 @@ end
 ;   CONFIG_PATH                        - optional YAML batch config path.
 ;   META_KERNEL_NAME                   - optional meta-kernel override passed through to NSP_RUN_PIPELINE.
 ;   ICY_DLM_PATH                       - optional ICY DLM override passed through to NSP_RUN_PIPELINE.
+;   DEBUG                              - when set, passes /DEBUG to NSP_RUN_PIPELINE so Step 1
+;                                        may use the local default KERNEL_PATH fallback.
 ;   GLOBAL_INCLUDE_KEPLERIAN_ELEMENTS  - when set, force Keplerian columns for all rows.
 ;   SUCCESS_COUNT / FAILURE_COUNT      - returned case counts.
 ;   SUCCEEDED_CASE_IDS / FAILED_CASE_IDS - returned case identifiers grouped by outcome.
@@ -143,6 +146,7 @@ pro nsp_run_batch, $
   config_path=config_path, $
   meta_kernel_name=meta_kernel_name, $
   icy_dlm_path=icy_dlm_path, $
+  debug=debug, $
   global_include_keplerian_elements=global_include_keplerian_elements, $
   success_count=success_count, $
   failure_count=failure_count, $
@@ -154,7 +158,7 @@ pro nsp_run_batch, $
   ; Initialize the repository path and base pipeline before reading any batch cases.
   nsp_setup_path
 
-  nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path
+  nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path, debug=debug
   resolve_routine, 'nsp_read_batch_cases', /COMPILE_FULL_FILE
   resolve_routine, 'nsp_export_csv', /COMPILE_FULL_FILE
   nsp_read_batch_cases, $

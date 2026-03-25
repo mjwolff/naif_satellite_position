@@ -50,10 +50,14 @@ pro nsp_validate_icy_environment, icy_dlm_path=icy_dlm_path
 end
 
 
-pro nsp_validate_environment, icy_dlm_path=icy_dlm_path
+pro nsp_validate_environment, icy_dlm_path=icy_dlm_path, debug=debug
   compile_opt strictarr
 
   kernels_path = strtrim(getenv('KERNEL_PATH'), 2)
+  if (kernels_path eq '') and keyword_set(debug) then begin
+    ; Debug mode allows local validation without requiring the environment variable.
+    kernels_path = '/Volumes/Wolff_misc1/nomad_naif/tgo_kernels/'
+  endif
 
   if kernels_path eq '' then begin
     message, 'Step 1 environment validation failed: KERNEL_PATH is not set. Define KERNEL_PATH to the local SPICE kernel root directory before running the pipeline.', /NONAME

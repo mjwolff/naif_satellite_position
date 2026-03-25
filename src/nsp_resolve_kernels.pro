@@ -15,10 +15,15 @@ function nsp_resolve_relative_meta_kernel, kernels_path, relative_name
 end
 
 
-function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name
+function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name, kernel_path=kernel_path
   compile_opt strictarr
 
-  kernels_path = strtrim(getenv('KERNEL_PATH'), 2)
+  kernels_path = ''
+  if n_elements(kernel_path) gt 0 then begin
+    kernels_path = strtrim(kernel_path, 2)
+  endif else begin
+    kernels_path = strtrim(getenv('KERNEL_PATH'), 2)
+  endelse
 
   if kernels_path eq '' then begin
     message, 'Step 2 kernel resolution failed: KERNEL_PATH is not set. Run environment validation before kernel resolution.', /NONAME
@@ -71,10 +76,10 @@ function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name
 end
 
 
-pro nsp_resolve_kernels, meta_kernel_name=meta_kernel_name, resolved_meta_kernel=resolved_meta_kernel
+pro nsp_resolve_kernels, meta_kernel_name=meta_kernel_name, kernel_path=kernel_path, resolved_meta_kernel=resolved_meta_kernel
   compile_opt strictarr
 
-  resolved_meta_kernel = nsp_resolve_meta_kernel(meta_kernel_name=meta_kernel_name)
+  resolved_meta_kernel = nsp_resolve_meta_kernel(meta_kernel_name=meta_kernel_name, kernel_path=kernel_path)
 
   print, 'Step 2 kernel resolution passed.'
   print, 'Resolved meta-kernel=' + resolved_meta_kernel
