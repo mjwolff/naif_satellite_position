@@ -4,6 +4,7 @@
 - Added `nsp_extract_occultation_events.pro` to build a `survey` structure from aggregate batch CSV output, including per-step spacecraft/tangent/sub-solar geometry arrays plus embedded `ING`/`EGR` event structs with interpolated ET boundaries and tangent-point min/max locations in degrees.
 - Added Step 10 tests and README usage notes for batch-CSV occultation-event extraction with the project default `altitude_max = 150 km`.
 - 2026-03-25 11:50:42 CET commit: Extract occultation events from batch CSV
+- 2026-03-25 17:19:50 CET commit: Return survey structure from occultation extractor
 
 ## 2026-03-24
 - Changed Step 10 batch execution to write one aggregate CSV per batch run, with per-case `batch_status` and `failure_message` columns and deterministic filenames derived from the batch config.
