@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-03-26
+- Added `config/example_tgo_keplerian_1y.yaml` and `nsp_plot_keplerian_relative_change.pro` as a one-year daily TGO Keplerian example that reads the aggregate CSV and plots relative drift in the non-dynamic Keplerian elements.
+- 2026-03-26 08:17:10 CET commit: Record changelog timestamp after batch fix push
+
+
 ## 2026-03-25
 - Added `nsp_extract_occultation_events.pro` to build a `survey` structure from aggregate batch CSV output, including per-step spacecraft/tangent/sub-solar geometry arrays plus embedded `ING`/`EGR` event structs with interpolated ET boundaries and tangent-point min/max locations in degrees.
 - Added Step 10 tests and README usage notes for batch-CSV occultation-event extraction with the project default `altitude_max = 150 km`.

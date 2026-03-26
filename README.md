@@ -245,6 +245,32 @@ IDL
 
 This expands to 2161 batch cases and writes one aggregate CSV at `outputs/example_tgo_occultation_3h.csv`. Each row includes the `occultation_valid` column, which is the explicit occultation flag for that spacecraft position, along with `batch_status` and `failure_message` columns for per-case diagnostics.
 
+Example batch configuration: to compute one year of daily TGO states starting at `2025-01-01T00:00:00` and also export Keplerian elements, use [`config/example_tgo_keplerian_1y.yaml`](/Users/mwolff/processing_local/chatgpt/naif_satellite_position/config/example_tgo_keplerian_1y.yaml):
+
+```yaml
+cases:
+  - case_id: tgo_keplerian_1y
+    utc_start: '2025-01-01T00:00:00'
+    utc_end: '2026-01-01T00:00:00'
+    dt_seconds: 86400
+    include_keplerian_elements: true
+```
+
+Run the batch and then plot the relative change of the non-dynamic Keplerian elements (`kep_rp_km`, `kep_eccentricity`, `kep_inclination_rad`, `kep_longitude_of_ascending_node_rad`, and `kep_argument_of_periapsis_rad`) with:
+
+```idl
+CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
+.COMPILE 'nsp_run_batch.pro'
+NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_keplerian_1y.yaml'
+
+.COMPILE 'nsp_setup_path.pro'
+NSP_SETUP_PATH
+.COMPILE 'src/nsp_plot_keplerian_relative_change.pro'
+NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE, 'outputs/example_tgo_keplerian_1y.csv', TITLE='TGO 2025 Daily Keplerian Drift', OUTPUT_PNG_PATH='outputs/example_tgo_keplerian_1y_relative_change.png', /USE_X
+```
+
+This example expands to 366 daily epochs from `2025-01-01T00:00:00` through `2026-01-01T00:00:00` inclusive. The plotting helper reads the aggregate CSV with `nsp_read_output_csv`, filters successful rows, unwraps the angular elements before differencing, and writes five separate larger plots with black axes on a white background and one colored data line per element. With `/USE_X`, each figure is rendered in an X window and captured with `TVRD(/TRUE)` before being written. With the example base path above, the PNG outputs are written as `outputs/example_tgo_keplerian_1y_relative_change_kep_rp_km.png` and the corresponding suffixed files for the other four elements.
+
 To extract occultation events from that aggregate batch CSV, call:
 
 ```idl

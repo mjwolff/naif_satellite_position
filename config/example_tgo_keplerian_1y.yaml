@@ -1,0 +1,6 @@
+cases:
+  - case_id: tgo_keplerian_1y
+    utc_start: '2025-01-01T00:00:00'
+    utc_end: '2026-01-01T00:00:00'
+    dt_seconds: 86400
+    include_keplerian_elements: true
