@@ -183,6 +183,21 @@ The optional Keplerian columns are appended in this order:
 kep_rp_km,kep_eccentricity,kep_inclination_rad,kep_longitude_of_ascending_node_rad,kep_argument_of_periapsis_rad,kep_mean_anomaly_rad,kep_epoch_et,kep_mu_km3_s2
 ```
 
+The exported Keplerian variables map to the standard orbital-element symbols used in the literature as follows:
+
+| CSV variable | Symbol | Description |
+| --- | --- | --- |
+| `kep_rp_km` | `r_p` | Periapsis radius, the distance from the center of Mars to periapsis. |
+| `kep_eccentricity` | `e` | Orbital eccentricity. |
+| `kep_inclination_rad` | `i` | Inclination of the orbital plane with respect to the reference plane. |
+| `kep_longitude_of_ascending_node_rad` | `\Omega` | Longitude of the ascending node, the inertial angle to the ascending-node direction. |
+| `kep_argument_of_periapsis_rad` | `\omega` | Argument of periapsis, the angle from ascending node to periapsis within the orbital plane. |
+| `kep_mean_anomaly_rad` | `M` | Mean anomaly at the reported epoch. |
+| `kep_epoch_et` | `t` | Ephemeris time associated with the osculating element set. |
+| `kep_mu_km3_s2` | `\mu` | Central-body gravitational parameter used for the element conversion. |
+
+For readers comparing against the classical six-element set `(a, e, i, \Omega, \omega, M)`, note that this export writes periapsis radius `r_p` instead of semi-major axis `a`. The relationship is `r_p = a(1 - e)` for elliptic orbits.
+
 ## Batch usage
 
 Step 10 batch execution reads deterministic case definitions from `config/tgo_cases.yaml` by default and writes one aggregate CSV per batch run beneath `outputs/`:

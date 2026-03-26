@@ -1,8 +1,10 @@
 # Changelog
 
 ## 2026-03-26
+- Documented the exported Keplerian CSV fields with their standard orbital-element symbols and literature-style definitions in `README.md`.
 - Added `config/example_tgo_keplerian_1y.yaml` and `nsp_plot_keplerian_relative_change.pro` as a one-year daily TGO Keplerian example that reads the aggregate CSV and plots relative drift in the non-dynamic Keplerian elements.
 - 2026-03-26 08:17:10 CET commit: Record changelog timestamp after batch fix push
+- 2026-03-26 09:45:12 CET commit: Add TGO Keplerian plotting example
 
 
 ## 2026-03-25

@@ -5,7 +5,19 @@
 function nsp_keplerian_plot_output_path, base_png_path, suffix
   compile_opt strictarr
 
-  resolved_base_path = file_expand_path(strtrim(base_png_path, 2))
+  resolved_base_path = strtrim(base_png_path, 2)
+  if resolved_base_path eq '' then begin
+    message, 'Step 10 Keplerian plot failed: base_png_path is empty.', /NONAME
+  endif
+
+  if strmid(resolved_base_path, strlen(resolved_base_path) - 1L, 1) ne '/' then begin
+    basename_length = strlen(resolved_base_path)
+    if (basename_length lt 4L) or (strlowcase(strmid(resolved_base_path, basename_length - 4L, 4L)) ne '.png') then begin
+      resolved_base_path = resolved_base_path + '/'
+    endif
+  endif
+
+  resolved_base_path = file_expand_path(resolved_base_path)
   resolved_suffix = strtrim(suffix, 2)
   if resolved_suffix eq '' then begin
     message, 'Step 10 Keplerian plot failed: plot suffix is empty.', /NONAME
@@ -47,8 +59,6 @@ pro nsp_render_keplerian_relative_plot, x_values, y_values, panel_title, line_co
 
   ; Reset to the standard grayscale table so the background/foreground indices are deterministic.
   loadct, 0, /silent
-;  !p.background = 255
-;  !p.color = 0
 
   plot, x_values, y_values, color=line_color_index, thick=3, background=255, title=panel_title, xtitle='Days since first sample', ytitle='Relative change', xstyle=1, ystyle=1, charsize=2.
 
