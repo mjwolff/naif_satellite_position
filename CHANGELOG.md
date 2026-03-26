@@ -6,6 +6,7 @@
 - 2026-03-26 08:17:10 CET commit: Record changelog timestamp after batch fix push
 - 2026-03-26 09:45:12 CET commit: Add TGO Keplerian plotting example
 - 2026-03-26 09:52:41 CET commit: Document Keplerian elements and normalize plot output path
+- 2026-03-26 09:58:30 CET commit: Record changelog timestamp after plotting docs update
 
 
 ## 2026-03-25
