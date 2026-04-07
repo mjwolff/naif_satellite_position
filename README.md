@@ -101,6 +101,18 @@ Or use the reporting procedure:
 NSP_TIME_GRID, START_UTC='2025-01-01T00:00:00', STEP_SECONDS=60D, POINT_COUNT=3L, ET_VALUES=grid
 ```
 
+To convert ephemeris time back to a UTC string, use `NSP_ET_TO_UTC`. Both scalar and vector inputs are accepted:
+
+```idl
+utc_string = NSP_ET_TO_UTC(et_value)
+print, utc_string
+
+utc_strings = NSP_ET_TO_UTC(grid)
+print, utc_strings
+```
+
+Output strings use ISO 8601 combined format with millisecond precision, e.g. `2025-01-01T00:00:00.000`.
+
 ## State-vector usage
 
 After kernels are loaded, Step 5 state retrieval can be used directly with one ET value:
@@ -299,6 +311,8 @@ NSP_RUN_TESTS
 
 The current test set checks:
 - Step 4 UTC-to-ET conversion against direct `cspice_str2et`
+- Step 4 ET-to-UTC scalar round-trip
+- Step 4 ET-to-UTC vector round-trip
 - Step 4 regular 3-point ET grid spacing
 - Step 4 empty-UTC failure handling
 - Step 4 invalid-point-count failure handling

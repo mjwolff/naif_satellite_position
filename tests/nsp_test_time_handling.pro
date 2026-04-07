@@ -59,14 +59,64 @@ pro nsp_test_time_grid_invalid_point_count_failure
 end
 
 
+pro nsp_test_utc_to_et_vector_success
+  compile_opt strictarr
+
+  utc_inputs = ['2025-01-01T00:00:00', '2025-06-15T12:30:00', '2025-12-31T23:59:59']
+  n = n_elements(utc_inputs)
+  et_values = nsp_utc_to_et(utc_inputs)
+
+  nsp_assert_true, n_elements(et_values) eq n, 'NSP_UTC_TO_ET vector did not return the correct number of elements.'
+  for i = 0L, n - 1L do begin
+    status = execute("cspice_str2et, utc_inputs[i], direct_et")
+    nsp_assert_true, status eq 1, 'direct cspice_str2et comparison call did not execute successfully for element ' + strtrim(i, 2)
+    nsp_assert_close, et_values[i], direct_et, 1D-6, 'NSP_UTC_TO_ET vector element ' + strtrim(i, 2) + ' does not match cspice_str2et.'
+  endfor
+end
+
+
+pro nsp_test_et_to_utc_scalar_roundtrip
+  compile_opt strictarr
+
+  utc_input = '2025-01-01T00:00:00'
+  et_value = nsp_utc_to_et(utc_input)
+  utc_output = nsp_et_to_utc(et_value)
+  et_roundtrip = nsp_utc_to_et(utc_output)
+
+  nsp_assert_true, size(utc_output, /TNAME) eq 'STRING', 'NSP_ET_TO_UTC did not return a string.'
+  nsp_assert_close, et_roundtrip, et_value, 5D-4, 'NSP_ET_TO_UTC scalar round-trip ET does not match original within 0.5 ms.'
+end
+
+
+pro nsp_test_et_to_utc_vector_roundtrip
+  compile_opt strictarr
+
+  utc_inputs = ['2025-01-01T00:00:00', '2025-06-15T12:30:00', '2025-12-31T23:59:59']
+  n = n_elements(utc_inputs)
+  et_values = dblarr(n)
+  for i = 0L, n - 1L do et_values[i] = nsp_utc_to_et(utc_inputs[i])
+
+  utc_outputs = nsp_et_to_utc(et_values)
+
+  nsp_assert_true, n_elements(utc_outputs) eq n, 'NSP_ET_TO_UTC vector did not return the correct number of elements.'
+  for i = 0L, n - 1L do begin
+    et_roundtrip = nsp_utc_to_et(utc_outputs[i])
+    nsp_assert_close, et_roundtrip, et_values[i], 5D-4, 'NSP_ET_TO_UTC vector round-trip failed for element ' + strtrim(i, 2)
+  endfor
+end
+
+
 pro nsp_test_time_handling
   compile_opt strictarr
 
   nsp_test_utc_to_et_success
+  nsp_test_utc_to_et_vector_success
   nsp_test_time_grid_success
   nsp_test_utc_to_et_empty_failure
   nsp_test_time_grid_invalid_point_count_failure
+  nsp_test_et_to_utc_scalar_roundtrip
+  nsp_test_et_to_utc_vector_roundtrip
 
   print, 'Step 4 tests passed.'
-  print, 'Validated UTC conversion, regular ET grid generation, and expected failure cases.'
+  print, 'Validated UTC/ET scalar and vector conversions, ET grid generation, and expected failure cases.'
 end
