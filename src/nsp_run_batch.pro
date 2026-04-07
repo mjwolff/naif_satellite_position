@@ -150,17 +150,7 @@ pro nsp_run_batch, $
   output_paths=output_paths
   compile_opt strictarr
 
-  ; Bootstrap: add this file's own directory (src/) to !PATH so nsp_setup_path is findable.
-  _self = routine_filepath('nsp_run_batch')
-  if _self ne '' then begin
-    _src_dir = file_dirname(_self)
-    if strpos(':' + !PATH + ':', ':' + _src_dir + ':') lt 0 then $
-      !PATH = _src_dir + ':' + !PATH
-  endif
-
-  ; Initialize the repository path and base pipeline before reading any batch cases.
-  nsp_setup_path
-
+  ; Initialize the base pipeline before reading any batch cases.
   nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path, debug=debug
   resolve_routine, 'nsp_read_batch_cases', /COMPILE_FULL_FILE
   resolve_routine, 'nsp_export_csv', /COMPILE_FULL_FILE

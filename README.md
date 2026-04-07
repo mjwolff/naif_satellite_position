@@ -30,9 +30,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - The native IDL `YAML_PARSE` routine must be available from the installed IDL distribution.
 - The ICY DLM path is resolved in this order: IDL keyword `ICY_DLM_PATH`, environment variable `ICY_DLM_PATH`, then the default `/Users/mwolff/lib/Darwin_arm64`.
 - The resolved ICY DLM directory, descriptor, and shared library must all exist and be readable.
-- `nsp_run_pipeline.pro`, `nsp_run_batch.pro`, `nsp_run_tests.pro`, and `nsp_setup_path.pro` all live under `src/`.
-- The entrypoints bootstrap `src/` into `!PATH` automatically using `ROUTINE_FILEPATH` so they work regardless of `!PATH` state at startup.
-- `nsp_setup_path.pro` adds `src/` (and optionally `tests/`) to `!PATH` relative to the repository root and is called by all three entrypoints.
+- All NSP routines must be on `!PATH` before any entrypoint is called. For development use, prepend `src/` (and `tests/` for test runs) to `!PATH` as shown in the examples below. For installed use, `install.sh` copies all routines to a flat directory; add that directory to `!PATH` in your `startup.pro`.
 - Repository exports are written beneath the root `outputs/` directory.
 - Batch case definitions are read from repository YAML configuration beneath `config/`.
 - Meta-kernel resolution is performed only beneath `KERNEL_PATH`.
@@ -59,20 +57,12 @@ If the canonical launcher fails in the Codex sandbox with `Unable to recognize s
 /Applications/NV5/idl92/bin/bin.darwin.arm64/idl
 ```
 
-From the IDL prompt, change into the repository and compile only the entrypoint:
+From the IDL prompt, change into the repository and run the pipeline:
 
 ```idl
 CD, '/Users/mwolff/src/idl/naif_satellite_position'
-.COMPILE 'src/nsp_run_pipeline.pro'
+!path = expand_path('+src') + ':' + !path
 NSP_RUN_PIPELINE
-```
-
-To set up the repository autoload path explicitly before compiling other routines:
-
-```idl
-CD, '/Users/mwolff/src/idl/naif_satellite_position'
-.COMPILE 'src/nsp_setup_path.pro'
-NSP_SETUP_PATH
 ```
 
 To override the ICY DLM path explicitly, pass the `ICY_DLM_PATH` keyword:
@@ -203,7 +193,7 @@ Step 10 batch execution reads deterministic case definitions from `config/tgo_ca
 
 ```idl
 CD, '/Users/mwolff/src/idl/naif_satellite_position'
-.COMPILE 'src/nsp_run_batch.pro'
+!path = expand_path('+src') + ':' + !path
 NSP_RUN_BATCH
 ```
 
@@ -251,7 +241,7 @@ export KERNEL_PATH=/Volumes/Wolff_misc1/nomad_naif/tgo_kernels/
 
 /Applications/NV5/idl92/bin/bin.darwin.arm64/idl <<'IDL'
 CD, '/Users/mwolff/src/idl/naif_satellite_position'
-.COMPILE 'src/nsp_run_batch.pro'
+!path = expand_path('+src') + ':' + !path
 NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_occultation_3h.yaml'
 EXIT
 IDL
@@ -274,12 +264,8 @@ Run the batch and then plot the relative change of the non-dynamic Keplerian ele
 
 ```idl
 CD, '/Users/mwolff/src/idl/naif_satellite_position'
-.COMPILE 'src/nsp_run_batch.pro'
+!path = expand_path('+src') + ':' + !path
 NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_keplerian_1y.yaml'
-
-.COMPILE 'src/nsp_setup_path.pro'
-NSP_SETUP_PATH
-.COMPILE 'src/nsp_plot_keplerian_relative_change.pro'
 NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE, 'outputs/example_tgo_keplerian_1y.csv', TITLE='TGO 2025 Daily Keplerian Drift', OUTPUT_PNG_PATH='outputs/example_tgo_keplerian_1y_relative_change.png', /USE_X
 ```
 
@@ -307,7 +293,7 @@ A focused test run is available through the test entrypoint:
 
 ```idl
 CD, '/Users/mwolff/src/idl/naif_satellite_position'
-.COMPILE 'src/nsp_run_tests.pro'
+!path = expand_path('+src') + ':' + expand_path('+tests') + ':' + !path
 NSP_RUN_TESTS
 ```
 
