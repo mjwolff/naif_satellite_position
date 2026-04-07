@@ -52,12 +52,18 @@ function nsp_export_outputs_directory
   compile_opt strictarr
 
   outputs_directory = file_expand_path('outputs')
+  cwd = file_expand_path('.')
+
   if ~file_test(outputs_directory, /DIRECTORY) then begin
-    message, 'Step 9 export failed: required outputs directory was not found relative to the current working directory: ' + outputs_directory, /NONAME
+    print, 'WARNING: Step 9 export: outputs directory not found: ' + outputs_directory
+    print, 'WARNING: Writing output to current directory instead: ' + cwd
+    return, cwd
   endif
 
   if ~file_test(outputs_directory, /WRITE) then begin
-    message, 'Step 9 export failed: outputs directory is not writable: ' + outputs_directory, /NONAME
+    print, 'WARNING: Step 9 export: outputs directory is not writable: ' + outputs_directory
+    print, 'WARNING: Writing output to current directory instead: ' + cwd
+    return, cwd
   endif
 
   return, outputs_directory

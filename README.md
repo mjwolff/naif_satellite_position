@@ -31,7 +31,7 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - The ICY DLM path is resolved in this order: IDL keyword `ICY_DLM_PATH`, environment variable `ICY_DLM_PATH`, then the default `/Users/mwolff/lib/Darwin_arm64`.
 - The resolved ICY DLM directory, descriptor, and shared library must all exist and be readable.
 - All NSP routines must be on `!PATH` before any entrypoint is called. For development use, prepend `src/` (and `tests/` for test runs) to `!PATH` as shown in the examples below. For installed use, `install.sh` copies all routines to a flat directory; add that directory to `!PATH` in your `startup.pro`.
-- Repository exports are written beneath the root `outputs/` directory.
+- Repository exports are written beneath the root `outputs/` directory. If `outputs/` does not exist or is not writable, export falls back to the current working directory with a printed warning.
 - Batch case definitions are read from repository YAML configuration beneath `config/`.
 - Meta-kernel resolution is performed only beneath `KERNEL_PATH`.
 - The default meta-kernel name is `em16_ops.tm`.
@@ -323,7 +323,7 @@ Expected behavior:
 
 - execution stops immediately with a clear message if `src/` is not available from the current working directory
 - execution stops immediately with a clear message if `tests/` is not available from the current working directory
-- execution stops immediately with a clear message if `outputs/` is not available from the current working directory
+- if `outputs/` is not available or not writable, export falls back to the current working directory and prints a warning rather than stopping execution
 - execution stops immediately with a clear message if `KERNEL_PATH` is missing or invalid
 - execution stops immediately with a clear message if the native IDL `YAML_PARSE` routine is unavailable
 - execution stops immediately with a clear message if the ICY DLM directory, `icy.dlm`, or `icy.so` is missing or unreadable
