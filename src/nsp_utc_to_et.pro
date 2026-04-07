@@ -1,3 +1,39 @@
+;+
+; NAME:
+;   NSP_UTC_TO_ET
+;
+; PURPOSE:
+;   Converts one or more UTC time strings to SPICE ephemeris time (ET,
+;   seconds past J2000). Wraps cspice_str2et via EXECUTE so that the
+;   call resolves correctly regardless of when the ICY DLM was loaded.
+;
+; CATEGORY:
+;   NAIF Satellite Position / Time Handling
+;
+; CALLING SEQUENCE:
+;   et = NSP_UTC_TO_ET(utc_strings)
+;
+; INPUTS:
+;   utc_strings - Scalar or array of UTC strings in any format
+;                 accepted by cspice_str2et, e.g. '2025-01-01T00:00:00'.
+;
+; OUTPUTS:
+;   Result - DOUBLE scalar if a single string was supplied, or DOUBLE
+;            array of the same length as utc_strings. Each element is
+;            the corresponding ephemeris time in seconds past J2000.
+;
+; NOTES:
+;   A loaded leapseconds kernel is required; furnish kernels via
+;   NSP_RUN_PIPELINE before calling this function. An error is raised
+;   for any empty string or non-finite result.
+;
+; EXAMPLE:
+;   et = NSP_UTC_TO_ET('2025-01-01T00:00:00')
+;   et_array = NSP_UTC_TO_ET(['2025-01-01T00:00:00', '2025-06-01T12:00:00'])
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation; vector support added
+;-
 function nsp_utc_to_et, utc_strings
   compile_opt strictarr
 

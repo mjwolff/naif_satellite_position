@@ -1,7 +1,32 @@
-; Build one PNG path for a named Keplerian-relative-change panel.
+;+
+; NAME:
+;   NSP_KEPLERIAN_PLOT_OUTPUT_PATH
 ;
-; Calling sequence:
-;   png_path = nsp_keplerian_plot_output_path(base_png_path, suffix)
+; PURPOSE:
+;   Builds the absolute PNG output path for one named Keplerian relative-change
+;   panel by appending a descriptive suffix to the base path.  If base_png_path
+;   ends with '.png', the suffix is inserted before the extension; otherwise
+;   it is appended after a trailing slash.
+;   Called internally by NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE.
+;
+; CATEGORY:
+;   NAIF Satellite Position / Plotting
+;
+; CALLING SEQUENCE:
+;   result = NSP_KEPLERIAN_PLOT_OUTPUT_PATH(base_png_path, suffix)
+;
+; INPUTS:
+;   base_png_path - STRING. Base path or directory for PNG output.
+;   suffix        - STRING. Descriptive token appended to the filename
+;                   (e.g. 'kep_rp_km').
+;
+; OUTPUTS:
+;   STRING scalar. Absolute PNG path for the panel.
+;   Raises an error if base_png_path or suffix is empty.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 function nsp_keplerian_plot_output_path, base_png_path, suffix
   compile_opt strictarr
 
@@ -10,6 +35,7 @@ function nsp_keplerian_plot_output_path, base_png_path, suffix
     message, 'Step 10 Keplerian plot failed: base_png_path is empty.', /NONAME
   endif
 
+  ; Treat a path that does not end in '.png' as a directory.
   if strmid(resolved_base_path, strlen(resolved_base_path) - 1L, 1) ne '/' then begin
     basename_length = strlen(resolved_base_path)
     if (basename_length lt 4L) or (strlowcase(strmid(resolved_base_path, basename_length - 4L, 4L)) ne '.png') then begin
@@ -23,6 +49,7 @@ function nsp_keplerian_plot_output_path, base_png_path, suffix
     message, 'Step 10 Keplerian plot failed: plot suffix is empty.', /NONAME
   endif
 
+  ; Strip '.png' from the basename before inserting the suffix.
   basename = file_basename(resolved_base_path)
   directory_name = file_dirname(resolved_base_path)
   basename_length = strlen(basename)
@@ -36,10 +63,46 @@ function nsp_keplerian_plot_output_path, base_png_path, suffix
 end
 
 
-; Render one Keplerian relative-change panel to either the current device or a PNG file.
+;+
+; NAME:
+;   NSP_RENDER_KEPLERIAN_RELATIVE_PLOT
 ;
-; Calling sequence:
-;   nsp_render_keplerian_relative_plot, x_values, y_values, panel_title, line_color_index, [output_png_path=output_png_path], [use_x=use_x]
+; PURPOSE:
+;   Renders one Keplerian relative-change panel using the IDL PLOT command.
+;   When OUTPUT_PNG_PATH is supplied, the panel is captured and written as
+;   a PNG file using either the Z (headless) device or an X window
+;   (controlled by /USE_X).  When OUTPUT_PNG_PATH is absent the plot is
+;   directed to the current graphics device for interactive inspection.
+;   Called internally by NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE.
+;
+; CATEGORY:
+;   NAIF Satellite Position / Plotting
+;
+; CALLING SEQUENCE:
+;   NSP_RENDER_KEPLERIAN_RELATIVE_PLOT, x_values, y_values, panel_title, $
+;     line_color_index $
+;     [, OUTPUT_PNG_PATH=output_png_path] $
+;     [, /USE_X]
+;
+; INPUTS:
+;   x_values         - DOUBLE array. Days since the first sample.
+;   y_values         - DOUBLE array. Relative change (dimensionless).
+;   panel_title      - STRING. Title string for the plot panel.
+;   line_color_index - INT scalar. Color table index for the plot line.
+;
+; OPTIONAL KEYWORDS:
+;   OUTPUT_PNG_PATH - STRING. Absolute path for the PNG output file.
+;                     When set, the plot is written to disk.
+;   USE_X           - When set together with OUTPUT_PNG_PATH, render in an
+;                     X window and capture with TVRD(/TRUE).  Otherwise the
+;                     Z device is used for headless rendering.
+;
+; OUTPUTS:
+;   None. Renders a plot and optionally writes a PNG file.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_render_keplerian_relative_plot, x_values, y_values, panel_title, line_color_index, output_png_path=output_png_path, use_x=use_x
   compile_opt strictarr
 
@@ -57,7 +120,7 @@ pro nsp_render_keplerian_relative_plot, x_values, y_values, panel_title, line_co
     endelse
   endif
 
-  ; Reset to the standard grayscale table so the background/foreground indices are deterministic.
+  ; Reset to the standard grayscale table so background/foreground indices are deterministic.
   loadct, 0, /silent
 
   plot, x_values, y_values, color=line_color_index, thick=3, background=255, title=panel_title, xtitle='Days since first sample', ytitle='Relative change', xstyle=1, ystyle=1, charsize=2.
@@ -75,31 +138,58 @@ pro nsp_render_keplerian_relative_plot, x_values, y_values, panel_title, line_co
 end
 
 
-; Plot relative changes in the non-dynamic Keplerian elements from one batch CSV.
+;+
+; NAME:
+;   NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE
 ;
-; Calling sequence:
-;   nsp_plot_keplerian_relative_change, csv_path
+; PURPOSE:
+;   Reads one aggregate batch CSV file that includes Keplerian export columns
+;   and renders five relative-change panels — one per non-dynamic Keplerian
+;   element (kep_rp_km, kep_eccentricity, kep_inclination_rad,
+;   kep_longitude_of_ascending_node_rad, kep_argument_of_periapsis_rad).
 ;
-; Inputs:
-;   csv_path - aggregate batch CSV path that includes Keplerian export columns.
+;   Relative change is computed as (value - value[0]) / |value[0]| against
+;   the first successful sample.  Angular elements (inclination, RAAN,
+;   argument of periapsis) are phase-unwrapped before differencing so that
+;   2π crossings do not introduce false discontinuities.
 ;
-; Keywords:
-;   TITLE            - optional plot-title prefix.
-;   OUTPUT_PNG_PATH  - optional PNG base path for saved plotting. When set, the routine
-;                      writes one PNG per element by appending a descriptive suffix.
-;   USE_X            - when set together with OUTPUT_PNG_PATH, render each figure in an
-;                      X window and capture it with TVRD(/TRUE) before writing the PNG.
-;                      Otherwise the routine uses the Z device for headless rendering.
+;   When OUTPUT_PNG_PATH is set, one PNG is written per element using
+;   NSP_KEPLERIAN_PLOT_OUTPUT_PATH to derive the per-panel filenames.
+;   When it is absent, the panels are rendered to the current graphics device.
 ;
-; Notes:
-;   The non-dynamic elements are treated here as:
-;     kep_rp_km
-;     kep_eccentricity
-;     kep_inclination_rad
-;     kep_longitude_of_ascending_node_rad
-;     kep_argument_of_periapsis_rad
-;   Relative change is computed against the first successful sample. Angular elements
-;   are unwrapped before differencing so 2*pi crossings do not introduce false jumps.
+; CATEGORY:
+;   NAIF Satellite Position / Plotting
+;
+; CALLING SEQUENCE:
+;   NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE, csv_path $
+;     [, TITLE=title] $
+;     [, OUTPUT_PNG_PATH=output_png_path] $
+;     [, /USE_X]
+;
+; INPUTS:
+;   csv_path - STRING scalar. Path to the aggregate batch CSV file.
+;              Must include the Keplerian element columns.
+;
+; OPTIONAL KEYWORDS:
+;   TITLE           - STRING. Optional plot-title prefix.
+;                     Default: 'TGO Non-Dynamic Keplerian Relative Change'.
+;   OUTPUT_PNG_PATH - STRING. Base path for PNG output files.  One PNG is
+;                     written per Keplerian element with a descriptive suffix.
+;   USE_X           - When set together with OUTPUT_PNG_PATH, render each
+;                     panel in an X window and capture it with TVRD(/TRUE).
+;                     Otherwise the Z device is used for headless rendering.
+;
+; OUTPUTS:
+;   None. Renders five panels and optionally writes five PNG files.
+;   Prints a completion summary. Raises an error on any failure.
+;
+; EXAMPLE:
+;   NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE, 'outputs/batch.csv'
+;   NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE, 'outputs/batch.csv', OUTPUT_PNG_PATH='outputs/kep'
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=output_png_path, use_x=use_x
   compile_opt strictarr
 
@@ -110,6 +200,7 @@ pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=o
   resolve_routine, 'nsp_read_output_csv', /COMPILE_FULL_FILE
   nsp_read_output_csv, csv_path, csv_data=csv_data
 
+  ; Verify that all required Keplerian and metadata columns are present.
   required_tags = ['et', 'batch_status', 'kep_rp_km', 'kep_eccentricity', 'kep_inclination_rad', 'kep_longitude_of_ascending_node_rad', 'kep_argument_of_periapsis_rad']
   csv_tag_names = strlowcase(tag_names(csv_data))
   for tag_index = 0L, n_elements(required_tags) - 1L do begin
@@ -123,6 +214,7 @@ pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=o
     message, 'Step 10 Keplerian plot failed: CSV file does not contain any data rows.', /NONAME
   endif
 
+  ; Identify successful rows.
   success_mask = bytarr(row_count)
   for i = 0L, row_count - 1L do begin
     if strlowcase(strtrim(csv_data.batch_status[i], 2)) eq 'success' then success_mask[i] = 1B
@@ -133,6 +225,7 @@ pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=o
     message, 'Step 10 Keplerian plot failed: need at least two successful rows with Keplerian elements.', /NONAME
   endif
 
+  ; Extract time and element arrays for successful rows.
   time_days = (double(csv_data.et[success_index]) - double(csv_data.et[success_index[0]])) / 86400D
   rp_values = double(csv_data.kep_rp_km[success_index])
   eccentricity_values = double(csv_data.kep_eccentricity[success_index])
@@ -144,6 +237,7 @@ pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=o
     message, 'Step 10 Keplerian plot failed: successful rows contain non-finite Keplerian values.', /NONAME
   endif
 
+  ; Phase-unwrap angular elements to remove 2π discontinuities before differencing.
   node_unwrapped = node_values
   periapsis_unwrapped = periapsis_values
   for i = 1L, success_count - 1L do begin
@@ -156,6 +250,7 @@ pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=o
     if periapsis_step lt (-1D * !dpi) then periapsis_unwrapped[i:*] = periapsis_unwrapped[i:*] + (2D * !dpi)
   endfor
 
+  ; Compute reference magnitudes; require non-zero to avoid division by zero.
   rp_reference = abs(rp_values[0])
   if rp_reference eq 0D then message, 'Step 10 Keplerian plot failed: kep_rp_km reference value is zero.', /NONAME
 
@@ -171,6 +266,7 @@ pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=o
   periapsis_reference = abs(periapsis_unwrapped[0])
   if periapsis_reference eq 0D then message, 'Step 10 Keplerian plot failed: kep_argument_of_periapsis_rad reference value is zero.', /NONAME
 
+  ; Relative change: Δ / |reference|.
   rp_relative = (rp_values - rp_values[0]) / rp_reference
   eccentricity_relative = (eccentricity_values - eccentricity_values[0]) / eccentricity_reference
   inclination_relative = (inclination_values - inclination_values[0]) / inclination_reference
@@ -182,6 +278,7 @@ pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=o
     if strtrim(title, 2) ne '' then plot_title_prefix = strtrim(title, 2)
   endif
 
+  ; Render one panel per element, writing PNGs when OUTPUT_PNG_PATH is set.
   if n_elements(output_png_path) gt 0 then begin
     nsp_render_keplerian_relative_plot, time_days, rp_relative, plot_title_prefix + ': kep_rp_km', 60, output_png_path=nsp_keplerian_plot_output_path(output_png_path, 'kep_rp_km'), use_x=use_x
     nsp_render_keplerian_relative_plot, time_days, eccentricity_relative, plot_title_prefix + ': kep_eccentricity', 61, output_png_path=nsp_keplerian_plot_output_path(output_png_path, 'kep_eccentricity'), use_x=use_x

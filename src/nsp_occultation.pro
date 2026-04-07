@@ -1,3 +1,51 @@
+;+
+; NAME:
+;   NSP_OCCULTATION
+;
+; PURPOSE:
+;   Reporting wrapper for Step 8. Retrieves TGO and Sun states, computes
+;   solar and occultation geometry, and prints a summary to the IDL
+;   console. Intended for interactive use and pipeline step validation.
+;
+; CATEGORY:
+;   NAIF Satellite Position / Geometry
+;
+; CALLING SEQUENCE:
+;   NSP_OCCULTATION, ET=et $
+;     [, STATE_VECTOR=state_vector] $
+;     [, SUN_STATE_VECTOR=sun_state_vector] $
+;     [, SPACECRAFT_TO_SUN_VECTOR=spacecraft_to_sun_vector] $
+;     [, TANGENT_POINT_VECTOR=tangent_point_vector] $
+;     [, TANGENT_LONGITUDE=tangent_longitude] $
+;     [, TANGENT_LATITUDE=tangent_latitude] $
+;     [, TANGENT_RADIUS=tangent_radius] $
+;     [, TANGENT_ALTITUDE=tangent_altitude] $
+;     [, OCCULTATION_VALID=occultation_valid] $
+;     [, CLOSEST_APPROACH_DISTANCE=closest_approach_distance]
+;
+; OPTIONAL KEYWORDS:
+;   ET                        - DOUBLE scalar. Ephemeris time. Required.
+;   STATE_VECTOR              - Output. DOUBLE array[6]. TGO state.
+;   SUN_STATE_VECTOR          - Output. DOUBLE array[6]. Sun state.
+;   SPACECRAFT_TO_SUN_VECTOR  - Output. DOUBLE array[3]. S/C-to-Sun vector.
+;   TANGENT_POINT_VECTOR      - Output. DOUBLE array[3]. Tangent point (km).
+;   TANGENT_LONGITUDE         - Output. DOUBLE scalar. Tangent longitude (rad).
+;   TANGENT_LATITUDE          - Output. DOUBLE scalar. Tangent latitude (rad).
+;   TANGENT_RADIUS            - Output. DOUBLE scalar. Tangent radius (km).
+;   TANGENT_ALTITUDE          - Output. DOUBLE scalar. Tangent altitude (km).
+;   OCCULTATION_VALID         - Output. BYTE scalar. 1 if occultation geometry
+;                               is valid, 0 otherwise.
+;   CLOSEST_APPROACH_DISTANCE - Output. DOUBLE scalar. Distance along ray
+;                               to closest approach (km).
+;
+; EXAMPLE:
+;   et = NSP_UTC_TO_ET('2025-01-01T00:00:00')
+;   NSP_OCCULTATION, ET=et, TANGENT_ALTITUDE=tang_alt, OCCULTATION_VALID=valid
+;   if valid then print, tang_alt
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_occultation, et=et, state_vector=state_vector, sun_state_vector=sun_state_vector, spacecraft_to_sun_vector=spacecraft_to_sun_vector, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude, occultation_valid=occultation_valid, closest_approach_distance=closest_approach_distance
   compile_opt strictarr
 

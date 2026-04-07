@@ -1,13 +1,29 @@
-; Return the aggregate batch CSV filename derived from a batch config path.
+;+
+; NAME:
+;   NSP_BATCH_OUTPUT_FILENAME_FROM_CONFIG_PATH
 ;
-; Calling sequence:
-;   output_filename = nsp_batch_output_filename_from_config_path(config_path)
+; PURPOSE:
+;   Derives the aggregate batch CSV filename from the batch YAML config path.
+;   Strips a trailing '.yaml' or '.yml' extension from the basename and
+;   appends '.csv'.  For example, 'config/tgo_cases.yaml' → 'tgo_cases.csv'.
+;   Called internally by NSP_RUN_BATCH.
 ;
-; Inputs:
-;   config_path - batch YAML path whose basename becomes the CSV filename.
+; CATEGORY:
+;   NAIF Satellite Position / Batch
 ;
-; Returns:
-;   A simple filename such as 'test_batch_valid.csv'.
+; CALLING SEQUENCE:
+;   result = NSP_BATCH_OUTPUT_FILENAME_FROM_CONFIG_PATH(config_path)
+;
+; INPUTS:
+;   config_path - STRING. Path to the batch YAML configuration file.
+;
+; OUTPUTS:
+;   STRING scalar. Simple filename (no directory component) for the aggregate
+;   batch CSV artifact.  Raises an error if the basename is empty after stripping.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 function nsp_batch_output_filename_from_config_path, config_path
   compile_opt strictarr
 
@@ -15,12 +31,14 @@ function nsp_batch_output_filename_from_config_path, config_path
   config_basename = file_basename(resolved_config_path)
   basename_length = strlen(config_basename)
 
+  ; Strip '.yaml' extension (case-insensitive).
   if basename_length gt 5 then begin
     if strlowcase(strmid(config_basename, basename_length - 5, 5)) eq '.yaml' then begin
       config_basename = strmid(config_basename, 0, basename_length - 5)
     endif
   endif
 
+  ; Strip '.yml' extension (case-insensitive).
   basename_length = strlen(config_basename)
   if basename_length gt 4 then begin
     if strlowcase(strmid(config_basename, basename_length - 4, 4)) eq '.yml' then begin
@@ -36,21 +54,38 @@ function nsp_batch_output_filename_from_config_path, config_path
 end
 
 
-; Normalize a caught IDL error message for safe inclusion in one CSV field.
+;+
+; NAME:
+;   NSP_BATCH_SAFE_FAILURE_MESSAGE
 ;
-; Calling sequence:
-;   safe_message = nsp_batch_safe_failure_message(raw_message)
+; PURPOSE:
+;   Sanitises a raw IDL error message for safe inclusion as a single CSV
+;   field value.  Joins multi-element arrays with a space, replaces
+;   newline/carriage-return characters with spaces, and replaces commas
+;   with semicolons.  Returns 'unknown_failure' for empty or undefined input.
+;   Called internally by NSP_RUN_BATCH.
 ;
-; Inputs:
-;   raw_message - scalar or array-valued error text from !ERROR_STATE.MSG.
+; CATEGORY:
+;   NAIF Satellite Position / Batch
 ;
-; Returns:
-;   A single-line message with embedded commas/newlines sanitized.
+; CALLING SEQUENCE:
+;   result = NSP_BATCH_SAFE_FAILURE_MESSAGE(raw_message)
+;
+; INPUTS:
+;   raw_message - STRING scalar or array. Error text from !ERROR_STATE.MSG.
+;
+; OUTPUTS:
+;   STRING scalar. Sanitised single-line message safe for CSV embedding.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 function nsp_batch_safe_failure_message, raw_message
   compile_opt strictarr
 
   if n_elements(raw_message) eq 0 then return, 'unknown_failure'
 
+  ; Collapse array-valued messages into a single space-separated string.
   if n_elements(raw_message) gt 1 then begin
     safe_message = strjoin(strtrim(raw_message, 2), ' ')
   endif else begin
@@ -62,6 +97,7 @@ function nsp_batch_safe_failure_message, raw_message
   linefeed = string(10B, format='(A1)')
   carriage_return = string(13B, format='(A1)')
 
+  ; Replace control characters and commas character-by-character.
   char_values = strmid(safe_message, lindgen(strlen(safe_message)), 1)
   for i = 0L, n_elements(char_values) - 1L do begin
     if (char_values[i] eq linefeed) or (char_values[i] eq carriage_return) then char_values[i] = ' '
@@ -77,32 +113,52 @@ function nsp_batch_safe_failure_message, raw_message
 end
 
 
-; Build one aggregate CSV row for a failed batch case.
+;+
+; NAME:
+;   NSP_BATCH_FAILURE_ROW_VALUES
 ;
-; Calling sequence:
-;   nsp_batch_failure_row_values, case_id, utc_string, include_keplerian_columns, failure_message, row_values=row_values
+; PURPOSE:
+;   Assembles a failure row for the aggregate batch CSV.  Science columns
+;   are filled with 'NaN' to preserve schema alignment; the batch_status
+;   column is set to 'failed' and the failure_message column contains the
+;   sanitised error text.
+;   Called internally by NSP_RUN_BATCH.
 ;
-; Inputs:
-;   case_id                   - case identifier for the failed batch row.
-;   utc_string                - UTC string associated with the failed case.
-;   include_keplerian_columns - nonzero when the aggregate schema includes Keplerian columns.
-;   failure_message           - human-readable failure text for the row.
+; CATEGORY:
+;   NAIF Satellite Position / Batch
 ;
-; Outputs:
-;   row_values - string array matching the aggregate CSV schema.
+; CALLING SEQUENCE:
+;   NSP_BATCH_FAILURE_ROW_VALUES, case_id, utc_string, $
+;     include_keplerian_columns, failure_message, $
+;     ROW_VALUES=row_values
+;
+; INPUTS:
+;   case_id                   - STRING scalar. Case identifier for the failed row.
+;   utc_string                - STRING scalar. UTC string associated with the case.
+;   include_keplerian_columns - INT/BYTE. Nonzero when the aggregate schema
+;                               includes Keplerian columns.
+;   failure_message           - STRING scalar. Human-readable failure text.
+;
+; OUTPUTS:
+;   ROW_VALUES - STRING array. One entry per aggregate CSV column.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_batch_failure_row_values, case_id, utc_string, include_keplerian_columns, failure_message, row_values=row_values
   compile_opt strictarr
 
   case_identifier = strtrim(case_id, 2)
   utc_value = strtrim(utc_string, 2)
 
-  ; Preserve the explicit UTC failure wording when we already know it is safe.
+  ; UTC-conversion failures already carry a deterministic message; pass through
+  ; without further sanitisation to preserve the exact wording in the CSV.
   safe_failure_message = strtrim(failure_message, 2)
   if strpos(safe_failure_message, 'UTC to ET') lt 0 then begin
     safe_failure_message = nsp_batch_safe_failure_message(failure_message)
   endif
 
-  ; Failure rows keep the same schema as success rows by filling science fields with NaN.
+  ; Fill science fields with NaN; keep case_id and utc for traceability.
   base_nan_values = nsp_export_nan_values(n_elements(nsp_export_base_header()) - 2L)
   row_values = [case_identifier, utc_value, base_nan_values]
 
@@ -114,29 +170,61 @@ pro nsp_batch_failure_row_values, case_id, utc_string, include_keplerian_columns
 end
 
 
-; Execute deterministic YAML batch cases and write one aggregate CSV for the run.
+;+
+; NAME:
+;   NSP_RUN_BATCH
 ;
-; Calling sequence:
-;   nsp_run_batch, [config_path=config_path], [meta_kernel_name=meta_kernel_name], $
-;     [icy_dlm_path=icy_dlm_path], [debug=debug], $
-;     [global_include_keplerian_elements=global_include_keplerian_elements], $
-;     [success_count=success_count], [failure_count=failure_count], $
-;     [succeeded_case_ids=succeeded_case_ids], [failed_case_ids=failed_case_ids], [output_paths=output_paths]
+; PURPOSE:
+;   Performs Step 10 of the NSP pipeline: reads batch cases from a YAML
+;   configuration file, runs the full computation chain for each case,
+;   and writes a single aggregate CSV file containing one row per case.
+;   Cases that fail are recorded with batch_status='failed' and NaN science
+;   values rather than aborting the run.  The batch fails only when every
+;   case fails.
 ;
-; Keywords:
-;   CONFIG_PATH                        - optional YAML batch config path.
-;   META_KERNEL_NAME                   - optional meta-kernel override passed through to NSP_RUN_PIPELINE.
-;   ICY_DLM_PATH                       - optional ICY DLM override passed through to NSP_RUN_PIPELINE.
-;   DEBUG                              - when set, passes /DEBUG to NSP_RUN_PIPELINE so Step 1
-;                                        may use the local default KERNEL_PATH fallback.
-;   GLOBAL_INCLUDE_KEPLERIAN_ELEMENTS  - when set, force Keplerian columns for all rows.
-;   SUCCESS_COUNT / FAILURE_COUNT      - returned case counts.
-;   SUCCEEDED_CASE_IDS / FAILED_CASE_IDS - returned case identifiers grouped by outcome.
-;   OUTPUT_PATHS                       - one-element array containing the aggregate CSV path.
+; CATEGORY:
+;   NAIF Satellite Position / Batch
 ;
-; Behavior:
-;   Each configured or expanded case contributes exactly one row to the aggregate file.
-;   Failed cases remain visible in the output with batch_status='failed' and NaN science values.
+; CALLING SEQUENCE:
+;   NSP_RUN_BATCH $
+;     [, CONFIG_PATH=config_path] $
+;     [, META_KERNEL_NAME=meta_kernel_name] $
+;     [, ICY_DLM_PATH=icy_dlm_path] $
+;     [, /DEBUG] $
+;     [, /GLOBAL_INCLUDE_KEPLERIAN_ELEMENTS] $
+;     [, SUCCESS_COUNT=success_count] $
+;     [, FAILURE_COUNT=failure_count] $
+;     [, SUCCEEDED_CASE_IDS=succeeded_case_ids] $
+;     [, FAILED_CASE_IDS=failed_case_ids] $
+;     [, OUTPUT_PATHS=output_paths]
+;
+; OPTIONAL KEYWORDS:
+;   CONFIG_PATH                       - STRING. Path to the YAML batch config.
+;                                       Default: 'config/tgo_cases.yaml'.
+;   META_KERNEL_NAME                  - STRING. Override passed to NSP_RUN_PIPELINE.
+;   ICY_DLM_PATH                      - STRING. Override passed to NSP_RUN_PIPELINE.
+;   DEBUG                             - When set, passes /DEBUG to NSP_RUN_PIPELINE
+;                                       to allow local KERNEL_PATH fallback.
+;   GLOBAL_INCLUDE_KEPLERIAN_ELEMENTS - When set, forces Keplerian columns for
+;                                       every row regardless of per-case settings.
+;   SUCCESS_COUNT                     - Output. LONG scalar. Number of passed cases.
+;   FAILURE_COUNT                     - Output. LONG scalar. Number of failed cases.
+;   SUCCEEDED_CASE_IDS                - Output. STRING array. IDs of passed cases.
+;   FAILED_CASE_IDS                   - Output. STRING array. IDs of failed cases.
+;   OUTPUT_PATHS                      - Output. STRING array[1]. Absolute path to the
+;                                       aggregate CSV file.
+;
+; OUTPUTS:
+;   All keyword outputs set on completion. Prints per-case and summary progress
+;   to the IDL console. Raises an error only when every case fails.
+;
+; EXAMPLE:
+;   NSP_RUN_BATCH, CONFIG_PATH='config/tgo_cases.yaml', SUCCESS_COUNT=n
+;   NSP_RUN_BATCH, /GLOBAL_INCLUDE_KEPLERIAN_ELEMENTS, OUTPUT_PATHS=p
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_run_batch, $
   config_path=config_path, $
   meta_kernel_name=meta_kernel_name, $
@@ -178,13 +266,14 @@ pro nsp_run_batch, $
   output_paths = ['']
   row_strings = strarr(case_count)
 
-  ; Decide the one batch-wide schema before generating any rows.
+  ; Decide the batch-wide schema once: Keplerian columns are included if any case
+  ; requests them or the global override is set.
   include_any_keplerian = keyword_set(global_include_keplerian_elements)
   if ~include_any_keplerian then begin
     include_any_keplerian = total(long(include_keplerian_values gt 0L)) gt 0L
   endif
 
-  ; The aggregate file has one fixed schema for the whole batch run.
+  ; The aggregate file uses one fixed schema for all rows (success and failure alike).
   header_values = nsp_export_header_values($
     include_keplerian_columns=include_any_keplerian, $
     include_batch_status=1B)
@@ -197,7 +286,7 @@ pro nsp_run_batch, $
     print, 'Step 10 batch case start: case_id=' + case_identifier
     print, 'Step 10 batch case UTC=' + utc_value
 
-    ; Validate UTC early so invalid timestamps produce a deterministic failure row.
+    ; Validate UTC early to produce a deterministic failure row for invalid timestamps.
     catch, error_status
     if error_status ne 0 then begin
       catch, /cancel
@@ -215,7 +304,7 @@ pro nsp_run_batch, $
     et_probe = nsp_utc_to_et(utc_value)
     catch, /cancel
 
-    ; Any later failure still produces one failed aggregate row rather than aborting the batch.
+    ; Any later failure still produces a failed aggregate row rather than aborting.
     catch, error_status
     if error_status ne 0 then begin
       error_message = !ERROR_STATE.MSG
@@ -254,6 +343,7 @@ pro nsp_run_batch, $
     output_path=batch_output_path
   output_paths[0] = batch_output_path
 
+  ; Trim the case-ID arrays to the actual count; return empty string for zero counts.
   if success_count gt 0L then begin
     succeeded_case_ids = succeeded_case_ids[0:success_count - 1L]
   endif else begin

@@ -1,3 +1,43 @@
+;+
+; NAME:
+;   NSP_COMPUTE_SOLAR_GEOMETRY
+;
+; PURPOSE:
+;   Computes the spacecraft-to-Sun vector and the spacecraft-local solar
+;   zenith angle from TGO and Sun state vectors in the IAU_MARS frame.
+;
+; CATEGORY:
+;   NAIF Satellite Position / Geometry
+;
+; CALLING SEQUENCE:
+;   NSP_COMPUTE_SOLAR_GEOMETRY, state_vector, sun_state_vector, $
+;     SPACECRAFT_TO_SUN_VECTOR=spacecraft_to_sun_vector, $
+;     SOLAR_ZENITH_ANGLE=solar_zenith_angle
+;
+; INPUTS:
+;   state_vector     - DOUBLE array[6]. TGO state in IAU_MARS frame (km, km/s).
+;   sun_state_vector - DOUBLE array[6]. Sun state relative to Mars in
+;                      IAU_MARS frame (km, km/s).
+;
+; OUTPUTS:
+;   SPACECRAFT_TO_SUN_VECTOR - DOUBLE array[3]. Vector from the spacecraft
+;                              to the Sun in km (IAU_MARS frame).
+;   SOLAR_ZENITH_ANGLE       - DOUBLE scalar. Spacecraft-local solar zenith
+;                              angle in radians, range [0, pi]. Defined as
+;                              the angle between the outward radial vector
+;                              at the spacecraft and the spacecraft-to-Sun
+;                              direction.
+;
+; ALGORITHM:
+;   spacecraft_to_sun = sun_position - spacecraft_position
+;   cos(SZA) = dot(spacecraft_position, spacecraft_to_sun) /
+;              (|spacecraft_position| * |spacecraft_to_sun|)
+;   Cosine is clamped to [-1, 1] before acos to guard against
+;   floating-point rounding outside the valid domain.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_compute_solar_geometry, state_vector, sun_state_vector, spacecraft_to_sun_vector=spacecraft_to_sun_vector, solar_zenith_angle=solar_zenith_angle
   compile_opt strictarr
 
@@ -44,6 +84,7 @@ pro nsp_compute_solar_geometry, state_vector, sun_state_vector, spacecraft_to_su
     message, 'Step 7 solar geometry failed: computed cosine of solar zenith angle is non-finite.', /NONAME
   endif
 
+  ; Clamp to [-1, 1] to guard against floating-point rounding before acos.
   if cosine_sza gt 1D then cosine_sza = 1D
   if cosine_sza lt (-1D) then cosine_sza = -1D
 

@@ -1,3 +1,31 @@
+;+
+; NAME:
+;   NSP_PRINT_TEST_RESULTS_TABLE
+;
+; PURPOSE:
+;   Prints a formatted summary table of test suite results to the IDL
+;   console.  Each row shows the suite name, total expected tests, pass
+;   count, and fail count.
+;   Called internally by NSP_RUN_TESTS.
+;
+; CATEGORY:
+;   NAIF Satellite Position / Testing
+;
+; CALLING SEQUENCE:
+;   NSP_PRINT_TEST_RESULTS_TABLE, test_names, test_counts, pass_counts, fail_counts
+;
+; INPUTS:
+;   test_names  - STRING array. Suite names (one per row).
+;   test_counts - LONG array. Expected number of tests per suite.
+;   pass_counts - LONG array. Number of tests that passed per suite.
+;   fail_counts - LONG array. Number of tests that failed per suite.
+;
+; OUTPUTS:
+;   None. Prints a tabular summary to stdout.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_print_test_results_table, test_names, test_counts, pass_counts, fail_counts
   compile_opt strictarr
 
@@ -11,6 +39,40 @@ pro nsp_print_test_results_table, test_names, test_counts, pass_counts, fail_cou
 end
 
 
+;+
+; NAME:
+;   NSP_RUN_TESTS
+;
+; PURPOSE:
+;   Runs the full NSP test suite across all eight pipeline steps (Steps 4–11).
+;   Calls NSP_RUN_PIPELINE first to initialise the SPICE kernel pool, then
+;   executes each step's test routine in order.  A failing suite prints the
+;   partial results table and re-raises the error; a passing suite increments
+;   its pass counter.  The final results table is always printed.
+;
+;   All NSP source and test routines must be on !PATH before calling this
+;   procedure.  The recommended invocation from the shell is:
+;
+;     idl -e "!path = EXPAND_PATH('+src') + ':' + EXPAND_PATH('+tests') + ':' + !path" \
+;         -e "NSP_RUN_TESTS"
+;
+; CATEGORY:
+;   NAIF Satellite Position / Testing
+;
+; CALLING SEQUENCE:
+;   NSP_RUN_TESTS [, ICY_DLM_PATH=icy_dlm_path]
+;
+; OPTIONAL KEYWORDS:
+;   ICY_DLM_PATH - STRING. Override path to the ICY DLM directory.
+;                  Passed through to NSP_RUN_PIPELINE.
+;
+; OUTPUTS:
+;   None. Prints per-suite progress and a final results table.
+;   Re-raises the first suite-level error encountered, halting execution.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_run_tests, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 

@@ -1,3 +1,39 @@
+;+
+; NAME:
+;   NSP_GET_TGO_STATE
+;
+; PURPOSE:
+;   Retrieves the ExoMars Trace Gas Orbiter (TGO) state vector in the
+;   IAU_MARS rotating body-fixed frame at a given ephemeris time, using
+;   the SPICE cspice_spkezr routine from the ICY DLM.
+;
+; CATEGORY:
+;   NAIF Satellite Position / State Vectors
+;
+; CALLING SEQUENCE:
+;   NSP_GET_TGO_STATE, et, STATE_VECTOR=state_vector [, LIGHT_TIME=light_time]
+;
+; INPUTS:
+;   et - DOUBLE scalar. Ephemeris time in seconds past J2000.
+;
+; OUTPUTS:
+;   STATE_VECTOR - DOUBLE array[6]. Position (km) and velocity (km/s)
+;                  of TGO relative to MARS in the IAU_MARS frame:
+;                  [x, y, z, vx, vy, vz].
+;   LIGHT_TIME   - DOUBLE scalar. One-way light time in seconds between
+;                  target and observer at the requested epoch.
+;
+; NOTES:
+;   Requires a loaded SPICE meta-kernel (furnished via NSP_LOAD_KERNELS).
+;   The working directory is temporarily changed to the meta-kernel
+;   directory before calling cspice_spkezr so that any relative kernel
+;   paths inside the meta-kernel resolve correctly.
+;   Frame: IAU_MARS. Observer: MARS. Target: TGO.
+;   Aberration correction: NSP_STATE_VECTOR_ABCORR() (default 'NONE').
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_get_tgo_state, et, state_vector=state_vector, light_time=light_time
   compile_opt strictarr
 
@@ -23,6 +59,8 @@ pro nsp_get_tgo_state, et, state_vector=state_vector, light_time=light_time
   abcorr = nsp_state_vector_abcorr()
   cd, current=original_directory
 
+  ; Temporarily change to the meta-kernel directory so that relative
+  ; kernel paths inside the meta-kernel resolve correctly at runtime.
   catch, error_status
   if error_status ne 0 then begin
     catch, /cancel

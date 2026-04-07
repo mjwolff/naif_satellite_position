@@ -1,14 +1,36 @@
-; Read one repository CSV output file into a structure whose tags match the header names.
+;+
+; NAME:
+;   NSP_READ_OUTPUT_CSV
 ;
-; Calling sequence:
-;   nsp_read_output_csv, csv_path, csv_data=csv_data
+; PURPOSE:
+;   Reads one NSP output CSV file into an anonymous IDL structure whose
+;   tags match the header column names and whose values are string arrays
+;   containing one entry per data row.  Validates that the file exists,
+;   that every data row has the same column count as the header, and that
+;   at least one data row is present.
 ;
-; Inputs:
-;   csv_path - path to one repository CSV output file.
+; CATEGORY:
+;   NAIF Satellite Position / Export
 ;
-; Outputs:
-;   csv_data - anonymous structure whose tags match the CSV headers and whose values
-;              are string arrays containing one entry per data row.
+; CALLING SEQUENCE:
+;   NSP_READ_OUTPUT_CSV, csv_path, CSV_DATA=csv_data
+;
+; INPUTS:
+;   csv_path - STRING scalar. Path to the NSP output CSV file to read.
+;
+; OUTPUTS:
+;   CSV_DATA - Anonymous structure. One tag per header column; each tag
+;              holds a STRING array[n_rows] containing the raw field text
+;              for that column.  Numeric columns can be converted with
+;              DOUBLE(csv_data.column_name).
+;
+; EXAMPLE:
+;   NSP_READ_OUTPUT_CSV, 'outputs/single_case.csv', CSV_DATA=d
+;   print, double(d.et)
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_read_output_csv, csv_path, csv_data=csv_data
   compile_opt strictarr
 
@@ -25,6 +47,7 @@ pro nsp_read_output_csv, csv_path, csv_data=csv_data
     message, 'Step 9 CSV reader failed: expected CSV file was not found: ' + resolved_csv_path, /NONAME
   endif
 
+  ; Read all lines into a List, then convert to a string array.
   line_values = List()
   openr, lun, resolved_csv_path, /get_lun
 
@@ -42,12 +65,14 @@ pro nsp_read_output_csv, csv_path, csv_data=csv_data
     message, 'Step 9 CSV reader failed: CSV file must contain one header row and at least one data row: ' + resolved_csv_path, /NONAME
   endif
 
+  ; Parse header to determine the column schema.
   header_names = strsplit(csv_lines[0], ',', /extract)
   header_count = n_elements(header_names)
   if header_count eq 0 then begin
     message, 'Step 9 CSV reader failed: header row did not contain any columns: ' + resolved_csv_path, /NONAME
   endif
 
+  ; Load all data rows into a [n_columns, n_rows] string table.
   row_count = n_elements(csv_lines) - 1L
   field_table = strarr(header_count, row_count)
 
@@ -60,6 +85,7 @@ pro nsp_read_output_csv, csv_path, csv_data=csv_data
     field_table[*, row_index] = row_fields
   endfor
 
+  ; Build the output structure one column at a time.
   csv_data = create_struct(header_names[0], reform(field_table[0, *]))
   for column_index = 1L, header_count - 1L do begin
     csv_data = create_struct(csv_data, header_names[column_index], reform(field_table[column_index, *]))

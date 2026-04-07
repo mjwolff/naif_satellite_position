@@ -1,3 +1,27 @@
+;+
+; NAME:
+;   NSP_VALIDATE_IDL_YAML_ENVIRONMENT
+;
+; PURPOSE:
+;   Verifies that the native IDL YAML_PARSE routine is available and
+;   returns a well-formed YAML mapping for a minimal test document.
+;   Called internally by NSP_VALIDATE_ENVIRONMENT (Step 1).
+;
+; CATEGORY:
+;   NAIF Satellite Position / Environment Validation
+;
+; CALLING SEQUENCE:
+;   NSP_VALIDATE_IDL_YAML_ENVIRONMENT
+;
+; INPUTS:
+;   None
+;
+; OUTPUTS:
+;   None. Raises an error if YAML_PARSE is unavailable or misbehaves.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_validate_idl_yaml_environment
   compile_opt strictarr
 
@@ -17,6 +41,32 @@ pro nsp_validate_idl_yaml_environment
 end
 
 
+;+
+; NAME:
+;   NSP_VALIDATE_ICY_ENVIRONMENT
+;
+; PURPOSE:
+;   Verifies that the ICY DLM directory, descriptor file (icy.dlm), and
+;   shared library (icy.so) all exist and are readable.
+;   Called internally by NSP_VALIDATE_ENVIRONMENT (Step 1).
+;
+; CATEGORY:
+;   NAIF Satellite Position / Environment Validation
+;
+; CALLING SEQUENCE:
+;   NSP_VALIDATE_ICY_ENVIRONMENT [, ICY_DLM_PATH=icy_dlm_path]
+;
+; OPTIONAL KEYWORDS:
+;   ICY_DLM_PATH - STRING. Override path to the ICY DLM directory.
+;                  Resolved via NSP_RESOLVE_ICY_DLM_PATH if not supplied.
+;
+; OUTPUTS:
+;   None. Raises an error if any required ICY component is missing or
+;   unreadable.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_validate_icy_environment, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
@@ -50,6 +100,40 @@ pro nsp_validate_icy_environment, icy_dlm_path=icy_dlm_path
 end
 
 
+;+
+; NAME:
+;   NSP_VALIDATE_ENVIRONMENT
+;
+; PURPOSE:
+;   Performs Step 1 of the NSP pipeline: validates that the KERNEL_PATH
+;   environment variable points to a readable directory, that the IDL
+;   YAML parser is available, and that the ICY DLM components are present
+;   and readable.
+;
+; CATEGORY:
+;   NAIF Satellite Position / Environment Validation
+;
+; CALLING SEQUENCE:
+;   NSP_VALIDATE_ENVIRONMENT [, ICY_DLM_PATH=icy_dlm_path] [, /DEBUG]
+;
+; OPTIONAL KEYWORDS:
+;   ICY_DLM_PATH - STRING. Override path to the ICY DLM directory.
+;                  Resolved via NSP_RESOLVE_ICY_DLM_PATH if not supplied.
+;   DEBUG        - When set, allows a hardcoded local KERNEL_PATH fallback
+;                  if the environment variable is not set. For development
+;                  use only.
+;
+; OUTPUTS:
+;   None. Prints a validation summary on success. Raises an error and
+;   halts execution on any validation failure.
+;
+; EXAMPLE:
+;   NSP_VALIDATE_ENVIRONMENT
+;   NSP_VALIDATE_ENVIRONMENT, ICY_DLM_PATH='/usr/local/lib/icy'
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_validate_environment, icy_dlm_path=icy_dlm_path, debug=debug
   compile_opt strictarr
 

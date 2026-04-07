@@ -1,3 +1,57 @@
+;+
+; NAME:
+;   NSP_VALIDATE_OUTPUTS
+;
+; PURPOSE:
+;   Performs Step 11 of the NSP pipeline: validates the full set of computed
+;   outputs for one epoch against a suite of physical consistency checks.
+;   Verifies finiteness, sign constraints, planetocentric angle ranges, and
+;   the altitude/radius/mean-radius identity.  For occultation-valid cases,
+;   applies the same checks to the tangent-point geometry and confirms that
+;   all tangent fields are finite.  For non-occultation cases, confirms that
+;   all tangent fields are explicitly non-finite.
+;   Called internally by NSP_BUILD_EXPORT_ROW (Step 9).
+;
+; CATEGORY:
+;   NAIF Satellite Position / Validation
+;
+; CALLING SEQUENCE:
+;   NSP_VALIDATE_OUTPUTS, state_vector, $
+;     LONGITUDE=longitude, $
+;     LATITUDE=latitude, $
+;     RADIUS=radius, $
+;     ALTITUDE=altitude, $
+;     SOLAR_ZENITH_ANGLE=solar_zenith_angle, $
+;     OCCULTATION_VALID=occultation_valid, $
+;     TANGENT_POINT_VECTOR=tangent_point_vector, $
+;     TANGENT_LONGITUDE=tangent_longitude, $
+;     TANGENT_LATITUDE=tangent_latitude, $
+;     TANGENT_RADIUS=tangent_radius, $
+;     TANGENT_ALTITUDE=tangent_altitude
+;
+; INPUTS:
+;   state_vector - DOUBLE array[6]. Spacecraft state in IAU_MARS (km, km/s).
+;
+; OPTIONAL KEYWORDS:
+;   LONGITUDE            - DOUBLE scalar. Spacecraft IAU_MARS longitude (rad).
+;   LATITUDE             - DOUBLE scalar. Spacecraft IAU_MARS latitude (rad).
+;   RADIUS               - DOUBLE scalar. Spacecraft radial distance (km).
+;   ALTITUDE             - DOUBLE scalar. Spacecraft altitude above Mars mean sphere (km).
+;   SOLAR_ZENITH_ANGLE   - DOUBLE scalar. Spacecraft-local solar zenith angle (rad).
+;   OCCULTATION_VALID    - BYTE scalar. 1 if solar occultation geometry is valid.
+;   TANGENT_POINT_VECTOR - DOUBLE array[3]. Tangent-point position (km); NaN if invalid.
+;   TANGENT_LONGITUDE    - DOUBLE scalar. Tangent-point longitude (rad); NaN if invalid.
+;   TANGENT_LATITUDE     - DOUBLE scalar. Tangent-point latitude (rad); NaN if invalid.
+;   TANGENT_RADIUS       - DOUBLE scalar. Tangent-point radial distance (km); NaN if invalid.
+;   TANGENT_ALTITUDE     - DOUBLE scalar. Tangent-point altitude (km); NaN if invalid.
+;
+; OUTPUTS:
+;   None. Prints a validation summary on success.  Raises a fatal error on
+;   any failed check, halting execution.
+;
+; MODIFICATION HISTORY:
+;   2026-04-07: Initial implementation
+;-
 pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
   compile_opt strictarr
 
@@ -10,6 +64,7 @@ pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, 
     message, 'Step 11 validation failed: spacecraft state vector contains non-finite values.', /NONAME
   endif
 
+  ; Verify that each required scalar keyword was provided.
   if n_elements(longitude) ne 1 then begin
     message, 'Step 11 validation failed: longitude was not provided as a scalar.', /NONAME
   endif
@@ -36,6 +91,7 @@ pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, 
   altitude_value = double(altitude)
   solar_zenith_angle_value = double(solar_zenith_angle)
 
+  ; Finiteness checks.
   if ~finite(longitude_value) then begin
     message, 'Step 11 validation failed: longitude is non-finite.', /NONAME
   endif
@@ -56,6 +112,7 @@ pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, 
     message, 'Step 11 validation failed: solar zenith angle is non-finite.', /NONAME
   endif
 
+  ; Planetocentric angle range checks.
   if (latitude_value lt (-0.5D * !dpi)) or (latitude_value gt (0.5D * !dpi)) then begin
     message, 'Step 11 validation failed: latitude is outside the valid planetocentric range.', /NONAME
   endif
@@ -68,6 +125,7 @@ pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, 
     message, 'Step 11 validation failed: solar zenith angle is outside the valid range [0, pi].', /NONAME
   endif
 
+  ; Altitude/radius identity: altitude = radius - Mars mean radius.
   radius_tolerance = 1D-9
   altitude_tolerance = 1D-9
   if abs(radius_value - (altitude_value + nsp_mars_mean_radius_km())) gt radius_tolerance then begin
@@ -94,6 +152,7 @@ pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, 
   tangent_altitude_value = double(tangent_altitude)
 
   if occultation_flag eq 1L then begin
+    ; Occultation-valid: all tangent fields must be finite and physically plausible.
     if total(finite(tangent_values)) ne 3 then begin
       message, 'Step 11 validation failed: occultation-valid tangent-point vector contains non-finite values.', /NONAME
     endif
@@ -126,6 +185,7 @@ pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, 
       message, 'Step 11 validation failed: occultation-valid tangent altitude is physically implausible for a positive-radius tangent point.', /NONAME
     endif
   endif else begin
+    ; Non-occultation: all tangent fields must be explicitly non-finite (NaN).
     if total(finite(tangent_values)) gt 0 then begin
       message, 'Step 11 validation failed: non-occultation cases must not report finite tangent-point vector values.', /NONAME
     endif
