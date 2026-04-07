@@ -30,10 +30,9 @@ Only **Step 1 - environment validation**, **Step 2 - kernel resolution**, **Step
 - The native IDL `YAML_PARSE` routine must be available from the installed IDL distribution.
 - The ICY DLM path is resolved in this order: IDL keyword `ICY_DLM_PATH`, environment variable `ICY_DLM_PATH`, then the default `/Users/mwolff/lib/Darwin_arm64`.
 - The resolved ICY DLM directory, descriptor, and shared library must all exist and be readable.
-- `nsp_run_pipeline.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
-- `nsp_run_batch.pro` expects to be launched from the repository root so it can add `src/` to `!PATH` automatically.
-- `nsp_run_tests.pro` expects to be launched from the repository root so it can add both `src/` and `tests/` to `!PATH` automatically.
-- Root-level `nsp_setup_path.pro` provides the shared `!PATH` setup used by the repository entrypoints.
+- `nsp_run_pipeline.pro`, `nsp_run_batch.pro`, `nsp_run_tests.pro`, and `nsp_setup_path.pro` all live under `src/`.
+- The entrypoints bootstrap `src/` into `!PATH` automatically using `ROUTINE_FILEPATH` so they work regardless of `!PATH` state at startup.
+- `nsp_setup_path.pro` adds `src/` (and optionally `tests/`) to `!PATH` relative to the repository root and is called by all three entrypoints.
 - Repository exports are written beneath the root `outputs/` directory.
 - Batch case definitions are read from repository YAML configuration beneath `config/`.
 - Meta-kernel resolution is performed only beneath `KERNEL_PATH`.
@@ -63,16 +62,16 @@ If the canonical launcher fails in the Codex sandbox with `Unable to recognize s
 From the IDL prompt, change into the repository and compile only the entrypoint:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
-.COMPILE 'nsp_run_pipeline.pro'
+CD, '/Users/mwolff/src/idl/naif_satellite_position'
+.COMPILE 'src/nsp_run_pipeline.pro'
 NSP_RUN_PIPELINE
 ```
 
 To set up the repository autoload path explicitly before compiling other routines:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_orbit_v2/naif_satellite_position'
-.COMPILE 'nsp_setup_path.pro'
+CD, '/Users/mwolff/src/idl/naif_satellite_position'
+.COMPILE 'src/nsp_setup_path.pro'
 NSP_SETUP_PATH
 ```
 
@@ -203,8 +202,8 @@ For readers comparing against the classical six-element set `(a, e, i, \Omega, \
 Step 10 batch execution reads deterministic case definitions from `config/tgo_cases.yaml` by default and writes one aggregate CSV per batch run beneath `outputs/`:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
-.COMPILE 'nsp_run_batch.pro'
+CD, '/Users/mwolff/src/idl/naif_satellite_position'
+.COMPILE 'src/nsp_run_batch.pro'
 NSP_RUN_BATCH
 ```
 
@@ -251,8 +250,8 @@ set -euo pipefail
 export KERNEL_PATH=/Volumes/Wolff_misc1/nomad_naif/tgo_kernels/
 
 /Applications/NV5/idl92/bin/bin.darwin.arm64/idl <<'IDL'
-CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
-.COMPILE 'nsp_run_batch.pro'
+CD, '/Users/mwolff/src/idl/naif_satellite_position'
+.COMPILE 'src/nsp_run_batch.pro'
 NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_occultation_3h.yaml'
 EXIT
 IDL
@@ -260,7 +259,7 @@ IDL
 
 This expands to 2161 batch cases and writes one aggregate CSV at `outputs/example_tgo_occultation_3h.csv`. Each row includes the `occultation_valid` column, which is the explicit occultation flag for that spacecraft position, along with `batch_status` and `failure_message` columns for per-case diagnostics.
 
-Example batch configuration: to compute one year of daily TGO states starting at `2025-01-01T00:00:00` and also export Keplerian elements, use [`config/example_tgo_keplerian_1y.yaml`](/Users/mwolff/processing_local/chatgpt/naif_satellite_position/config/example_tgo_keplerian_1y.yaml):
+Example batch configuration: to compute one year of daily TGO states starting at `2025-01-01T00:00:00` and also export Keplerian elements, use [`config/example_tgo_keplerian_1y.yaml`](/Users/mwolff/src/idl/naif_satellite_position/config/example_tgo_keplerian_1y.yaml):
 
 ```yaml
 cases:
@@ -274,11 +273,11 @@ cases:
 Run the batch and then plot the relative change of the non-dynamic Keplerian elements (`kep_rp_km`, `kep_eccentricity`, `kep_inclination_rad`, `kep_longitude_of_ascending_node_rad`, and `kep_argument_of_periapsis_rad`) with:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
-.COMPILE 'nsp_run_batch.pro'
+CD, '/Users/mwolff/src/idl/naif_satellite_position'
+.COMPILE 'src/nsp_run_batch.pro'
 NSP_RUN_BATCH, CONFIG_PATH='config/example_tgo_keplerian_1y.yaml'
 
-.COMPILE 'nsp_setup_path.pro'
+.COMPILE 'src/nsp_setup_path.pro'
 NSP_SETUP_PATH
 .COMPILE 'src/nsp_plot_keplerian_relative_change.pro'
 NSP_PLOT_KEPLERIAN_RELATIVE_CHANGE, 'outputs/example_tgo_keplerian_1y.csv', TITLE='TGO 2025 Daily Keplerian Drift', OUTPUT_PNG_PATH='outputs/example_tgo_keplerian_1y_relative_change.png', /USE_X
@@ -307,8 +306,8 @@ Step-specific test routines now live under the repository root `tests/` director
 A focused test run is available through the test entrypoint:
 
 ```idl
-CD, '/Users/mwolff/processing_local/chatgpt/naif_satellite_position'
-.COMPILE 'nsp_run_tests.pro'
+CD, '/Users/mwolff/src/idl/naif_satellite_position'
+.COMPILE 'src/nsp_run_tests.pro'
 NSP_RUN_TESTS
 ```
 

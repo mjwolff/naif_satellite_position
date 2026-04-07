@@ -14,6 +14,14 @@ end
 pro nsp_run_tests, icy_dlm_path=icy_dlm_path
   compile_opt strictarr
 
+  ; Bootstrap: add this file's own directory (src/) to !PATH so nsp_setup_path is findable.
+  _self = routine_filepath('nsp_run_tests')
+  if _self ne '' then begin
+    _src_dir = file_dirname(_self)
+    if strpos(':' + !PATH + ':', ':' + _src_dir + ':') lt 0 then $
+      !PATH = _src_dir + ':' + !PATH
+  endif
+
   nsp_setup_path, /include_tests
 
   test_names = ['Step 4 Time Handling', 'Step 5 State Vectors', 'Step 6 Geometry', 'Step 7 Solar Geometry', 'Step 8 Occultation', 'Step 9 Export', 'Step 10 Batch', 'Step 11 Validation']

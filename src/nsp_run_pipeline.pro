@@ -1,6 +1,14 @@
 pro nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path, debug=debug
   compile_opt strictarr
 
+  ; Bootstrap: add this file's own directory (src/) to !PATH so nsp_setup_path is findable.
+  _self = routine_filepath('nsp_run_pipeline')
+  if _self ne '' then begin
+    _src_dir = file_dirname(_self)
+    if strpos(':' + !PATH + ':', ':' + _src_dir + ':') lt 0 then $
+      !PATH = _src_dir + ':' + !PATH
+  endif
+
   nsp_setup_path
 
   kernel_path_value = strtrim(getenv('KERNEL_PATH'), 2)
