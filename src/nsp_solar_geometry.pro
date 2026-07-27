@@ -36,7 +36,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_solar_geometry, et=et, state_vector=state_vector, sun_state_vector=sun_state_vector, spacecraft_to_sun_vector=spacecraft_to_sun_vector, solar_zenith_angle=solar_zenith_angle
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et) eq 0 then begin
     message, 'Step 7 solar geometry failed: ET was not provided.', /NONAME

@@ -31,7 +31,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_compute_geometry_from_state, state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, position_vector=position_vector
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(state_vector) ne 6 then begin
     message, 'Step 6 geometry conversion failed: expected a 6-element state vector.', /NONAME

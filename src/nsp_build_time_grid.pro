@@ -34,7 +34,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_build_time_grid, start_utc, step_seconds, point_count
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(step_seconds) eq 0 then begin
     message, 'Step 4 time handling failed: step_seconds was not provided.', /NONAME

@@ -23,7 +23,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_validate_idl_yaml_environment
-  compile_opt strictarr
+  compile_opt idl2
 
   catch, error_status
   if error_status ne 0 then begin
@@ -68,7 +68,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_validate_icy_environment, icy_dlm_path=icy_dlm_path
-  compile_opt strictarr
+  compile_opt idl2
 
   icy_dlm_directory = nsp_resolve_icy_dlm_path(icy_dlm_path=icy_dlm_path)
   icy_dlm_file = icy_dlm_directory + '/icy.dlm'
@@ -135,7 +135,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_validate_environment, icy_dlm_path=icy_dlm_path, debug=debug
-  compile_opt strictarr
+  compile_opt idl2
 
   kernels_path = strtrim(getenv('KERNEL_PATH'), 2)
   if (kernels_path eq '') and keyword_set(debug) then begin

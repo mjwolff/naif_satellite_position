@@ -1,5 +1,5 @@
 pro nsp_test_state_vector_success
-  compile_opt strictarr
+  compile_opt idl2
 
   et_value = nsp_utc_to_et('2025-01-01T00:00:00')
   nsp_get_tgo_state, et_value, state_vector=state_vector, light_time=light_time
@@ -35,7 +35,7 @@ end
 
 
 pro nsp_test_state_vector_invalid_et_failure
-  compile_opt strictarr
+  compile_opt idl2
 
   catch, error_status
   if error_status ne 0 then begin
@@ -53,7 +53,7 @@ end
 
 
 pro nsp_test_state_vectors
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_test_state_vector_success
   nsp_test_state_vector_invalid_et_failure

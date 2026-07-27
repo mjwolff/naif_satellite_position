@@ -38,7 +38,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_compute_geometry_from_position, position_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(position_vector) ne 3 then begin
     message, 'Step 6 geometry conversion failed: expected a 3-element position vector.', /NONAME

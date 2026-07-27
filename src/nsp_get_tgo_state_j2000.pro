@@ -36,7 +36,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_get_tgo_state_j2000, et, state_vector=state_vector, light_time=light_time
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et) eq 0 then begin
     message, 'Step 9 export failed: ET was not provided for J2000 state retrieval.', /NONAME

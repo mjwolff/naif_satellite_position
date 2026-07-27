@@ -33,7 +33,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_geometry, et=et, state_vector=state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et) eq 0 then begin
     message, 'Step 6 geometry conversion failed: ET was not provided.', /NONAME

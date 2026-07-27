@@ -23,7 +23,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_export_base_header
-  compile_opt strictarr
+  compile_opt idl2
 
   return, ['case_id', 'utc', 'et', 'sc_x_km', 'sc_y_km', 'sc_z_km', 'sc_vx_km_s', 'sc_vy_km_s', 'sc_vz_km_s', 'sc_longitude_rad', 'sc_latitude_rad', 'sc_radius_km', 'sc_altitude_km', 'solar_zenith_angle_rad', 'subsolar_latitude_rad', 'subsolar_longitude_rad', 'occultation_valid', 'tangent_x_km', 'tangent_y_km', 'tangent_z_km', 'tangent_longitude_rad', 'tangent_latitude_rad', 'tangent_radius_km', 'tangent_altitude_km']
 end
@@ -55,7 +55,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_export_keplerian_header
-  compile_opt strictarr
+  compile_opt idl2
 
   return, ['kep_rp_km', 'kep_eccentricity', 'kep_inclination_rad', 'kep_longitude_of_ascending_node_rad', 'kep_argument_of_periapsis_rad', 'kep_mean_anomaly_rad', 'kep_epoch_et', 'kep_mu_km3_s2']
 end
@@ -89,7 +89,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_csv_value_string, value
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(value) eq 0 then return, 'NaN'
 
@@ -133,7 +133,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_export_join_row, values
-  compile_opt strictarr
+  compile_opt idl2
 
   return, strjoin(values, ',')
 end
@@ -165,7 +165,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_export_nan_values, value_count
-  compile_opt strictarr
+  compile_opt idl2
 
   if value_count le 0L then return, ['']
 
@@ -202,7 +202,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_export_outputs_directory
-  compile_opt strictarr
+  compile_opt idl2
 
   outputs_directory = file_expand_path('outputs')
   cwd = file_expand_path('.')
@@ -256,7 +256,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_export_resolve_output_path, default_filename, output_filename=output_filename
-  compile_opt strictarr
+  compile_opt idl2
 
   ; Prefer the caller-supplied name; fall back to the default.
   export_filename = strtrim(default_filename, 2)
@@ -317,7 +317,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_export_header_values, include_keplerian_columns=include_keplerian_columns, include_batch_status=include_batch_status
-  compile_opt strictarr
+  compile_opt idl2
 
   header_values = nsp_export_base_header()
   if keyword_set(include_keplerian_columns) then begin
@@ -368,7 +368,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_build_export_row, utc_string=utc_string, case_id=case_id, include_keplerian_elements=include_keplerian_elements, force_keplerian_columns=force_keplerian_columns, row_values=row_values
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(utc_string) eq 0 then begin
     message, 'Step 9 export failed: utc_string was not provided.', /NONAME
@@ -446,7 +446,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_write_csv_file, header_values, row_strings, default_filename=default_filename, output_filename=output_filename, output_path=output_path
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(header_values) eq 0 then begin
     message, 'Step 9 export failed: header_values were not provided for CSV writing.', /NONAME
@@ -511,7 +511,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_export_csv, utc_string=utc_string, case_id=case_id, output_filename=output_filename, output_path=output_path, include_keplerian_elements=include_keplerian_elements
-  compile_opt strictarr
+  compile_opt idl2
 
   case_identifier = 'single_case'
   if n_elements(case_id) gt 0 then begin

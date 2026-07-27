@@ -26,7 +26,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_resolve_relative_meta_kernel, kernels_path, relative_name
-  compile_opt strictarr
+  compile_opt idl2
 
   candidate_path = file_expand_path(kernels_path + '/' + relative_name)
 
@@ -78,7 +78,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_resolve_meta_kernel, meta_kernel_name=meta_kernel_name, kernel_path=kernel_path
-  compile_opt strictarr
+  compile_opt idl2
 
   ; Determine the kernel root: prefer keyword, then environment variable.
   kernels_path = ''
@@ -181,7 +181,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_resolve_kernels, meta_kernel_name=meta_kernel_name, kernel_path=kernel_path, resolved_meta_kernel=resolved_meta_kernel
-  compile_opt strictarr
+  compile_opt idl2
 
   resolved_meta_kernel = nsp_resolve_meta_kernel(meta_kernel_name=meta_kernel_name, kernel_path=kernel_path)
 

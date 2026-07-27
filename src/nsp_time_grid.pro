@@ -33,7 +33,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_time_grid, start_utc=start_utc, step_seconds=step_seconds, point_count=point_count, et_values=et_values
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(start_utc) eq 0 then begin
     message, 'Step 4 time handling failed: start_utc was not provided.', /NONAME

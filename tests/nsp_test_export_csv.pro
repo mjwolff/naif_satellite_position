@@ -1,5 +1,5 @@
 pro nsp_read_two_line_text_file, file_path, header_line=header_line, data_line=data_line
-  compile_opt strictarr
+  compile_opt idl2
 
   header_line = ''
   data_line = ''
@@ -16,7 +16,7 @@ end
 
 
 pro nsp_test_export_csv_base_success
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_string = '2025-01-01T00:00:00'
   nsp_export_csv, utc_string=utc_string, case_id='step9_base', output_filename='step9_base.csv', output_path=output_path
@@ -47,7 +47,7 @@ end
 
 
 pro nsp_test_export_csv_keplerian_success
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_string = '2025-01-01T00:00:00'
   et_value = nsp_utc_to_et(utc_string)
@@ -73,7 +73,7 @@ end
 
 
 pro nsp_test_read_output_csv_success
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_string = '2025-01-01T00:00:00'
   nsp_export_csv, utc_string=utc_string, case_id='step9_reader', output_filename='step9_reader.csv', output_path=output_path
@@ -88,7 +88,7 @@ end
 
 
 pro nsp_test_export_csv
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_test_export_csv_base_success
   nsp_test_export_csv_keplerian_success

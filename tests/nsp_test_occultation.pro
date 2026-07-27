@@ -1,5 +1,5 @@
 pro nsp_test_occultation_actual_case
-  compile_opt strictarr
+  compile_opt idl2
 
   et_value = nsp_utc_to_et('2025-01-01T00:00:00')
   nsp_get_tgo_state, et_value, state_vector=state_vector, light_time=spacecraft_light_time
@@ -33,7 +33,7 @@ end
 
 
 pro nsp_test_occultation_synthetic_success
-  compile_opt strictarr
+  compile_opt idl2
 
   synthetic_state = dblarr(6)
   synthetic_state[0] = 4000D
@@ -56,7 +56,7 @@ end
 
 
 pro nsp_test_occultation_synthetic_non_occultation
-  compile_opt strictarr
+  compile_opt idl2
 
   synthetic_state = dblarr(6)
   synthetic_state[0] = 4000D
@@ -76,7 +76,7 @@ end
 
 
 pro nsp_test_occultation_invalid_state_failure
-  compile_opt strictarr
+  compile_opt idl2
 
   catch, error_status
   if error_status ne 0 then begin
@@ -94,7 +94,7 @@ end
 
 
 pro nsp_test_occultation
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_test_occultation_actual_case
   nsp_test_occultation_synthetic_success

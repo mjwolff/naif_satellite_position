@@ -27,7 +27,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_mars_mean_radius_km
-  compile_opt strictarr
+  compile_opt idl2
 
   return, 3389.5D
 end

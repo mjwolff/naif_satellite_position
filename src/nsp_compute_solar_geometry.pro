@@ -39,7 +39,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_compute_solar_geometry, state_vector, sun_state_vector, spacecraft_to_sun_vector=spacecraft_to_sun_vector, solar_zenith_angle=solar_zenith_angle
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(state_vector) ne 6 then begin
     message, 'Step 7 solar geometry failed: expected a 6-element spacecraft state vector.', /NONAME

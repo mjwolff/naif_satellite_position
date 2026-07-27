@@ -1,5 +1,5 @@
 pro nsp_test_utc_to_et_success
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_string = '2025-01-01T00:00:00'
   converted_et = nsp_utc_to_et(utc_string)
@@ -12,7 +12,7 @@ end
 
 
 pro nsp_test_time_grid_success
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_string = '2025-01-01T00:00:00'
   expected_start_et = nsp_utc_to_et(utc_string)
@@ -26,7 +26,7 @@ end
 
 
 pro nsp_test_utc_to_et_empty_failure
-  compile_opt strictarr
+  compile_opt idl2
 
   catch, error_status
   if error_status ne 0 then begin
@@ -43,7 +43,7 @@ end
 
 
 pro nsp_test_time_grid_invalid_point_count_failure
-  compile_opt strictarr
+  compile_opt idl2
 
   catch, error_status
   if error_status ne 0 then begin
@@ -60,7 +60,7 @@ end
 
 
 pro nsp_test_utc_to_et_vector_success
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_inputs = ['2025-01-01T00:00:00', '2025-06-15T12:30:00', '2025-12-31T23:59:59']
   n = n_elements(utc_inputs)
@@ -76,7 +76,7 @@ end
 
 
 pro nsp_test_et_to_utc_scalar_roundtrip
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_input = '2025-01-01T00:00:00'
   et_value = nsp_utc_to_et(utc_input)
@@ -89,7 +89,7 @@ end
 
 
 pro nsp_test_et_to_utc_vector_roundtrip
-  compile_opt strictarr
+  compile_opt idl2
 
   utc_inputs = ['2025-01-01T00:00:00', '2025-06-15T12:30:00', '2025-12-31T23:59:59']
   n = n_elements(utc_inputs)
@@ -107,7 +107,7 @@ end
 
 
 pro nsp_test_time_handling
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_test_utc_to_et_success
   nsp_test_utc_to_et_vector_success

@@ -47,7 +47,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_occultation, et=et, state_vector=state_vector, sun_state_vector=sun_state_vector, spacecraft_to_sun_vector=spacecraft_to_sun_vector, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude, occultation_valid=occultation_valid, closest_approach_distance=closest_approach_distance
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et) eq 0 then begin
     message, 'Step 8 occultation geometry failed: ET was not provided.', /NONAME

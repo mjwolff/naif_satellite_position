@@ -29,7 +29,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_solar_geometry_abcorr
-  compile_opt strictarr
+  compile_opt idl2
 
   return, 'NONE'
 end

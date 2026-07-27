@@ -51,7 +51,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_compute_keplerian_elements, et, inertial_state_vector, keplerian_elements=keplerian_elements, mars_gm=mars_gm
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et) eq 0 then begin
     message, 'Step 9 export failed: ET was not provided for Keplerian-element calculation.', /NONAME

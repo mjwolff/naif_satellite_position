@@ -28,7 +28,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_keplerian_plot_output_path, base_png_path, suffix
-  compile_opt strictarr
+  compile_opt idl2
 
   resolved_base_path = strtrim(base_png_path, 2)
   if resolved_base_path eq '' then begin
@@ -104,7 +104,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_render_keplerian_relative_plot, x_values, y_values, panel_title, line_color_index, output_png_path=output_png_path, use_x=use_x
-  compile_opt strictarr
+  compile_opt idl2
 
   old_device = !d.name
   if n_elements(output_png_path) gt 0 then begin
@@ -191,7 +191,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_plot_keplerian_relative_change, csv_path, title=title, output_png_path=output_png_path, use_x=use_x
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(csv_path) eq 0 then begin
     message, 'Step 10 Keplerian plot failed: csv_path was not provided.', /NONAME

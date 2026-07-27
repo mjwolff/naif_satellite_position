@@ -24,7 +24,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_default_icy_dlm_path
-  compile_opt strictarr
+  compile_opt idl2
 
   return, '/Users/mwolff/lib/Darwin_arm64'
 end
@@ -62,7 +62,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_resolve_icy_dlm_path, icy_dlm_path=icy_dlm_path
-  compile_opt strictarr
+  compile_opt idl2
 
   resolved_path = ''
 

@@ -23,7 +23,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_default_batch_config_path
-  compile_opt strictarr
+  compile_opt idl2
 
   return, file_expand_path('config/tgo_cases.yaml')
 end
@@ -57,7 +57,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_output_filename_from_case_id, case_identifier
-  compile_opt strictarr
+  compile_opt idl2
 
   trimmed_case_identifier = strtrim(case_identifier, 2)
   if trimmed_case_identifier eq '' then begin
@@ -106,7 +106,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_has_control_characters, text_value
-  compile_opt strictarr
+  compile_opt idl2
 
   return, (strpos(text_value, string(byte(9))) ge 0) or $
     (strpos(text_value, string(byte(10))) ge 0) or $
@@ -142,7 +142,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_required_string, case_definition, field_name, case_index
-  compile_opt strictarr
+  compile_opt idl2
 
   if ~case_definition.HasKey(field_name) then begin
     message, 'Step 10 batch configuration failed: case ' + strtrim(case_index, 2) + ' field ''' + field_name + ''' is missing.', /NONAME
@@ -195,7 +195,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_optional_string, case_definition, field_name, case_index
-  compile_opt strictarr
+  compile_opt idl2
 
   if ~case_definition.HasKey(field_name) then return, ''
 
@@ -241,7 +241,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_optional_boolean, case_definition, field_name, case_index
-  compile_opt strictarr
+  compile_opt idl2
 
   if ~case_definition.HasKey(field_name) then return, 0B
 
@@ -282,7 +282,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_required_positive_integer, case_definition, field_name, case_index
-  compile_opt strictarr
+  compile_opt idl2
 
   if ~case_definition.HasKey(field_name) then begin
     message, 'Step 10 batch configuration failed: case ' + strtrim(case_index, 2) + ' field ''' + field_name + ''' is missing.', /NONAME
@@ -352,7 +352,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_utc_suffix, utc_string
-  compile_opt strictarr
+  compile_opt idl2
 
   if strlen(utc_string) lt 19 then begin
     message, 'Step 10 batch configuration failed: unable to derive a case-id suffix from UTC string: ' + utc_string, /NONAME
@@ -413,7 +413,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_read_batch_cases, config_path=config_path, case_ids=case_ids, utc_strings=utc_strings, include_keplerian_values=include_keplerian_values, output_filenames=output_filenames
-  compile_opt strictarr
+  compile_opt idl2
 
   ; Resolve the config path: keyword overrides the built-in default.
   resolved_config_path = nsp_default_batch_config_path()

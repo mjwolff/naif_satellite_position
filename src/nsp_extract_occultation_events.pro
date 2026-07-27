@@ -38,7 +38,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_empty_occultation_events
-  compile_opt strictarr
+  compile_opt idl2
 
   return, create_struct($
     'type', '', $
@@ -90,7 +90,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_interpolate_occultation_crossing_time, t0, a0, t1, a1, threshold
-  compile_opt strictarr
+  compile_opt idl2
 
   time0 = double(t0)
   time1 = double(t1)
@@ -149,7 +149,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_previous_finite_occultation_index, time_values, altitude_values, start_index
-  compile_opt strictarr
+  compile_opt idl2
 
   for candidate_index = start_index - 1L, 0L, -1L do begin
     if finite(double(time_values[candidate_index])) and finite(double(altitude_values[candidate_index])) then begin
@@ -189,7 +189,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_next_finite_occultation_index, time_values, altitude_values, start_index
-  compile_opt strictarr
+  compile_opt idl2
 
   last_index = n_elements(time_values) - 1L
   for candidate_index = start_index + 1L, last_index do begin
@@ -235,7 +235,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_previous_bracketing_occultation_index, time_values, altitude_values, start_index, threshold
-  compile_opt strictarr
+  compile_opt idl2
 
   current_altitude = double(altitude_values[start_index])
   threshold_value = double(threshold)
@@ -289,7 +289,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_next_bracketing_occultation_index, time_values, altitude_values, start_index, threshold
-  compile_opt strictarr
+  compile_opt idl2
 
   current_altitude = double(altitude_values[start_index])
   threshold_value = double(threshold)
@@ -374,7 +374,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_extract_occultation_events, csv_path, survey=survey, altitude_max_km=altitude_max_km, event_count=event_count
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(csv_path) eq 0 then begin
     message, 'Step 10 occultation-event extraction failed: csv_path was not provided.', /NONAME

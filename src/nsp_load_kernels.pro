@@ -26,7 +26,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_initialize_icy_runtime, icy_dlm_path=icy_dlm_path
-  compile_opt strictarr
+  compile_opt idl2
 
   icy_dlm_directory = nsp_resolve_icy_dlm_path(icy_dlm_path=icy_dlm_path)
   icy_dlm_file = icy_dlm_directory + '/icy.dlm'
@@ -95,7 +95,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_spice_kclear_checked
-  compile_opt strictarr
+  compile_opt idl2
 
   ; Wrapped in EXECUTE so the call resolves correctly even if the ICY DLM
   ; was loaded after this routine was compiled.
@@ -131,7 +131,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_spice_furnsh_checked, meta_kernel_path
-  compile_opt strictarr
+  compile_opt idl2
 
   command = 'cspice_furnsh, meta_kernel_path'
   status = execute(command)
@@ -167,7 +167,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_spice_ktotal_checked, kernel_count
-  compile_opt strictarr
+  compile_opt idl2
 
   status = execute("cspice_ktotal, 'ALL', kernel_count")
   if status eq 0 then begin
@@ -206,7 +206,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_spice_kdata_checked, kernel_index, file, kernel_type, source_file, handle, found
-  compile_opt strictarr
+  compile_opt idl2
 
   status = execute("cspice_kdata, kernel_index, 'ALL', file, kernel_type, source_file, handle, found")
   if status eq 0 then begin
@@ -242,7 +242,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_is_loaded_meta_kernel, resolved_meta_kernel
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_spice_ktotal_checked, kernel_count
 
@@ -305,7 +305,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_load_kernels, resolved_meta_kernel, kernel_count=kernel_count, icy_dlm_path=icy_dlm_path
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(resolved_meta_kernel) eq 0 then begin
     message, 'Step 3 kernel loading failed: resolved_meta_kernel was not provided.', /NONAME

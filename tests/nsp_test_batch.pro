@@ -1,5 +1,5 @@
 pro nsp_read_text_file_lines, file_path, lines=lines
-  compile_opt strictarr
+  compile_opt idl2
 
   if ~file_test(file_path, /REGULAR) then begin
     message, 'Batch tests failed: expected text file was not found: ' + file_path, /NONAME
@@ -21,7 +21,7 @@ end
 
 
 pro nsp_write_text_file_lines, file_path, lines
-  compile_opt strictarr
+  compile_opt idl2
 
   openw, lun, file_path, /get_lun
   for i = 0L, n_elements(lines) - 1L do begin
@@ -32,7 +32,7 @@ end
 
 
 pro nsp_test_batch_valid_config
-  compile_opt strictarr
+  compile_opt idl2
 
   expected_output_path = file_expand_path('outputs/test_batch_valid.csv')
   if file_test(expected_output_path, /REGULAR) then file_delete, expected_output_path
@@ -82,7 +82,7 @@ end
 
 
 pro nsp_test_batch_failure_isolation
-  compile_opt strictarr
+  compile_opt idl2
 
   expected_output_path = file_expand_path('outputs/test_batch_mixed.csv')
   if file_test(expected_output_path, /REGULAR) then file_delete, expected_output_path
@@ -123,7 +123,7 @@ end
 
 
 pro nsp_test_batch_invalid_range_config
-  compile_opt strictarr
+  compile_opt idl2
 
   catch, error_status
   if error_status ne 0 then begin
@@ -139,7 +139,7 @@ end
 
 
 pro nsp_test_batch_occultation_event_extraction
-  compile_opt strictarr
+  compile_opt idl2
 
   synthetic_output_path = file_expand_path('outputs/test_batch_occultation_events.csv')
   if file_test(synthetic_output_path, /REGULAR) then file_delete, synthetic_output_path
@@ -246,7 +246,7 @@ end
 
 
 pro nsp_test_batch
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_test_batch_valid_config
   nsp_test_batch_failure_isolation

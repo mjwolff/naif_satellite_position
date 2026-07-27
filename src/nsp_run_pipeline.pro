@@ -42,7 +42,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path, debug=debug
-  compile_opt strictarr
+  compile_opt idl2
 
   ; Read KERNEL_PATH once so it can be forwarded to both Step 1 and Step 2.
   kernel_path_value = strtrim(getenv('KERNEL_PATH'), 2)

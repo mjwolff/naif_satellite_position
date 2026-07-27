@@ -53,7 +53,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_validate_outputs, state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(state_vector) ne 6 then begin
     message, 'Step 11 validation failed: expected a 6-element spacecraft state vector.', /NONAME

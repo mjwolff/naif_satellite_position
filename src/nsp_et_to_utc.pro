@@ -42,7 +42,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_et_to_utc, et_values, noload=noload
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et_values) eq 0 then begin
     message, 'Step 4 time handling failed: et_values was not provided.', /NONAME

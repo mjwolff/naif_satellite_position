@@ -25,7 +25,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_output_filename_from_config_path, config_path
-  compile_opt strictarr
+  compile_opt idl2
 
   resolved_config_path = file_expand_path(strtrim(config_path, 2))
   config_basename = file_basename(resolved_config_path)
@@ -81,7 +81,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_batch_safe_failure_message, raw_message
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(raw_message) eq 0 then return, 'unknown_failure'
 
@@ -146,7 +146,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_batch_failure_row_values, case_id, utc_string, include_keplerian_columns, failure_message, row_values=row_values
-  compile_opt strictarr
+  compile_opt idl2
 
   case_identifier = strtrim(case_id, 2)
   utc_value = strtrim(utc_string, 2)
@@ -236,7 +236,7 @@ pro nsp_run_batch, $
   succeeded_case_ids=succeeded_case_ids, $
   failed_case_ids=failed_case_ids, $
   output_paths=output_paths
-  compile_opt strictarr
+  compile_opt idl2
 
   ; Initialize the base pipeline before reading any batch cases.
   nsp_run_pipeline, meta_kernel_name=meta_kernel_name, icy_dlm_path=icy_dlm_path, debug=debug

@@ -33,7 +33,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_state_vectors, et=et, state_vector=state_vector, light_time=light_time
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et) eq 0 then begin
     message, 'Step 5 state-vector retrieval failed: ET was not provided.', /NONAME

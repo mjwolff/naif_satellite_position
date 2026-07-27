@@ -32,7 +32,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_read_output_csv, csv_path, csv_data=csv_data
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(csv_path) eq 0 then begin
     message, 'Step 9 CSV reader failed: csv_path was not provided.', /NONAME

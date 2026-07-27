@@ -36,7 +36,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_get_sun_state, et, sun_state_vector=sun_state_vector, light_time=light_time
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(et) eq 0 then begin
     message, 'Step 7 solar geometry failed: ET was not provided.', /NONAME

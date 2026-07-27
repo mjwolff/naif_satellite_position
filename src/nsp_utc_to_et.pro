@@ -35,7 +35,7 @@
 ;   2026-04-07: Initial implementation; vector support added
 ;-
 function nsp_utc_to_et, utc_strings
-  compile_opt strictarr
+  compile_opt idl2
 
   if n_elements(utc_strings) eq 0 then begin
     message, 'Step 4 time handling failed: utc_string was not provided.', /NONAME

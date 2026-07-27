@@ -37,7 +37,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 function nsp_loaded_meta_kernel_path, set_value=set_value, clear=clear
-  compile_opt strictarr
+  compile_opt idl2
 
   common nsp_pipeline_state_common, stored_meta_kernel_path
 

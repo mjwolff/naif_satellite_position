@@ -27,7 +27,7 @@
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_print_test_results_table, test_names, test_counts, pass_counts, fail_counts
-  compile_opt strictarr
+  compile_opt idl2
 
   print, 'Test Results'
   print, string('Test Name', 'Total', 'Pass', 'Fail', format='(A24,2X,A5,2X,A4,2X,A4)')
@@ -74,7 +74,7 @@ end
 ;   2026-04-07: Initial implementation
 ;-
 pro nsp_run_tests, icy_dlm_path=icy_dlm_path
-  compile_opt strictarr
+  compile_opt idl2
 
   test_names = ['Step 4 Time Handling', 'Step 5 State Vectors', 'Step 6 Geometry', 'Step 7 Solar Geometry', 'Step 8 Occultation', 'Step 9 Export', 'Step 10 Batch', 'Step 11 Validation']
   test_counts = [7L, 2L, 2L, 2L, 4L, 3L, 4L, 4L]

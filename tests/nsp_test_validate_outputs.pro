@@ -1,5 +1,5 @@
 pro nsp_step11_valid_case_values, state_vector=state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
-  compile_opt strictarr
+  compile_opt idl2
 
   et_value = nsp_utc_to_et('2025-01-01T00:00:00')
   nsp_get_tgo_state, et_value, state_vector=state_vector, light_time=spacecraft_light_time
@@ -11,7 +11,7 @@ end
 
 
 pro nsp_test_validate_outputs_success
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_step11_valid_case_values, state_vector=state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
 
@@ -20,7 +20,7 @@ end
 
 
 pro nsp_test_validate_outputs_nonfinite_failure
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_step11_valid_case_values, state_vector=state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
   state_vector[0] = !values.d_infinity
@@ -38,7 +38,7 @@ end
 
 
 pro nsp_test_validate_outputs_solar_angle_failure
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_step11_valid_case_values, state_vector=state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
   solar_zenith_angle = !dpi + 0.01D
@@ -58,7 +58,7 @@ end
 
 
 pro nsp_test_validate_outputs_nonoccultation_tangent_failure
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_step11_valid_case_values, state_vector=state_vector, longitude=longitude, latitude=latitude, radius=radius, altitude=altitude, solar_zenith_angle=solar_zenith_angle, occultation_valid=occultation_valid, tangent_point_vector=tangent_point_vector, tangent_longitude=tangent_longitude, tangent_latitude=tangent_latitude, tangent_radius=tangent_radius, tangent_altitude=tangent_altitude
   occultation_valid = 0L
@@ -76,7 +76,7 @@ end
 
 
 pro nsp_test_validate_outputs
-  compile_opt strictarr
+  compile_opt idl2
 
   nsp_test_validate_outputs_success
   nsp_test_validate_outputs_nonfinite_failure
